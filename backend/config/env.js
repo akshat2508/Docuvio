@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* Determine environment */
+/* Determine environment {checking deployment after changing the origin repo} */ 
 const env = process.env.NODE_ENV || "development";
 
 /* Choose correct env file */
