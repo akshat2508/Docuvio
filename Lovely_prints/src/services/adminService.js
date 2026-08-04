@@ -67,3 +67,15 @@ export const addShopFinishType = async (shopId, payload) =>
 
 export const toggleShopFinishType = async (id, is_active) =>
   (await api.patch(`/admin/finish-types/${id}/toggle`, { is_active })).data.data;
+
+
+
+// ==========================================
+// SHOP DRAFTS
+// ==========================================
+
+
+export const createShopDraft = async (payload) => {
+  const res = await api.post("/admin/shops", payload);
+  return res.data.data;
+};

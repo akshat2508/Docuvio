@@ -14,6 +14,7 @@ import OrganisationTrends from "./OrganisationTrends";
 import ShopOrders from "./ShopOrders";
 import OrderDrawer from "./OrderDrawer";
 import ShopPrintOptionsModal from "./ShopPrintOptionsModal";
+import CreateShopModal from "./CreateShopModal";
 import logo from "/src/assets/logo.png"
 import "./admin-theme.css";
 import "./admin.css";
@@ -38,7 +39,7 @@ const [revenueCalculated, setRevenueCalculated] = useState(false);
   const orgAnalyticsCache = useRef({});
   const shopAnalyticsCache = useRef({});
   const shopOrdersCache = useRef({});
-
+const [showCreateShopModal, setShowCreateShopModal] = useState(false);
   /* =========================
   ======
      LOAD ORGANISATIONS
@@ -261,9 +262,16 @@ const handleRevenueCalculation = async () => {
 
             {/* 🟢 NEW SHOPS SECTION WRAPPER */}
             <div className="shops-section-A">
-              <div className="shops-header-A">
-                <h3>Shops</h3>
-              </div>
+             <div className="shops-header-A">
+  <h3>Shops</h3>
+
+  <button
+    className="create-shop-btn-A"
+    onClick={() => setShowCreateShopModal(true)}
+  >
+    + Create Shop
+  </button>
+</div>
 
               <div className="shop-grid-A">
                 {shops.map((shop) => (
@@ -349,6 +357,14 @@ const handleRevenueCalculation = async () => {
       shop={printOptionsShop}
       onClose={() => setPrintOptionsShop(null)}
     />
+    <CreateShopModal
+  open={showCreateShopModal}
+  organisationId={selectedOrg?.id}
+  onClose={() => setShowCreateShopModal(false)}
+  onCreated={(shop) => {
+    setShops((prev) => [...prev, shop]);
+  }}
+/>
 
   </div>
 );
