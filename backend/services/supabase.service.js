@@ -840,6 +840,151 @@ async updateShopById(shopId, updates) {
     .single();
 }
 
+async inviteVendor(shopId) {
+
+  // 1️⃣ Fetch shop
+  const { data: shop, error: shopError } = await supabaseAdmin
+    .from("shops")
+    .select(`
+      id,
+      shop_name,
+      owner_name,
+      owner_email,
+      organisation_id,
+      status,
+      invite_attempts
+    `)
+    .eq("id", shopId)
+    .single();
+
+  if (shopError || !shop) {
+    return {
+      error: {
+        message: "Shop not found",
+      },
+    };
+  }
+
+  // 2️⃣ Already activated?
+  if (shop.status === "active") {
+    return {
+      error: {
+        message: "Vendor already activated.",
+      },
+    };
+  }
+
+  // 3️⃣ Email missing?
+  if (!shop.owner_email) {
+    return {
+      error: {
+        message: "Owner email is missing.",
+      },
+    };
+  }
+
+  // 4️⃣ Send invite
+  const { data, error } =
+    await supabaseAdmin.auth.admin.inviteUserByEmail(
+      shop.owner_email,
+      {
+        redirectTo:
+          `${process.env.FRONTEND_URL}/accept-invite`,
+
+        data: {
+          role: "shop_owner",
+          organisation_id: shop.organisation_id,
+          shop_id: shop.id,
+          shop_name: shop.shop_name,
+        },
+      }
+    );
+
+  if (error) {
+    return { error };
+  }
+
+  // 5️⃣ Update shop
+  const { error: updateError } = await supabaseAdmin
+    .from("shops")
+    .update({
+      status: "invite_sent",
+      invite_sent_at: new Date().toISOString(),
+      invite_attempts:
+        (shop.invite_attempts || 0) + 1,
+    })
+    .eq("id", shop.id);
+
+  if (updateError) {
+    return { error: updateError };
+  }
+
+  return {
+    data,
+  };
+}
+
+async activateShop(userId) {
+
+  // 1. Get authenticated user
+  const { data: userData, error: authError } =
+    await supabaseAdmin.auth.admin.getUserById(userId);
+
+  if (authError || !userData.user) {
+    return {
+      error: {
+        message: "User not found",
+      },
+    };
+  }
+
+  const authUser = userData.user;
+
+  const email = authUser.email;
+
+  // 2. Find the draft shop
+  const { data: shop, error: shopError } =
+    await supabaseAdmin
+      .from("shops")
+      .select("id, owner_id, status")
+      .eq("owner_email", email)
+      .single();
+
+  if (shopError || !shop) {
+    return {
+      error: {
+        message: "Draft shop not found",
+      },
+    };
+  }
+
+  // 3. Already activated?
+  if (shop.owner_id) {
+    return {
+      data: shop,
+    };
+  }
+
+  // 4. Activate shop
+  const { data, error } =
+    await supabaseAdmin
+      .from("shops")
+      .update({
+        owner_id: userId,
+        status: "active",
+        activated_at: new Date().toISOString(),
+      })
+      .eq("id", shop.id)
+      .select()
+      .single();
+
+  if (error) {
+    return { error };
+  }
+
+  return { data };
+}
+
 //to fetch student email , name and shop anme (email context helper)
 async getOrderEmailContext(orderId) {
   return await supabaseAdmin

@@ -79,3 +79,12 @@ export const createShopDraft = async (payload) => {
   const res = await api.post("/admin/shops", payload);
   return res.data.data;
 };
+
+
+export const inviteVendor = async (shopId) => {
+  const res = await api.post(
+    `/admin/shops/${shopId}/invite`
+  );
+
+  return res.data.data;
+};

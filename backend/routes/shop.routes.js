@@ -10,7 +10,8 @@ import {
   getShopOrders,
   getShopPrintOptions,
   getMyShopOrders,
-  getMyShop
+  getMyShop,
+  activateMyShop
 } from '../controllers/shop.controller.js';
 import { updateOrderStatus } from '../controllers/shop.controller.js';
 import { updateMyShopStatus } from '../controllers/shop.controller.js';
@@ -21,6 +22,12 @@ const router = express.Router();
 // Public routes
 // --------------------
 router.get('/', getAllShops);
+router.post(
+  "/activate",
+  authMiddleware,
+  requireRole("shop_owner"),
+  activateMyShop
+);
 router.get(
   '/me',
   authMiddleware,

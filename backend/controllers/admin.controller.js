@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "../services/supabase.service.js";
 import { successResponse, errorResponse } from "../utils/response.js";
-
+import supabaseService from "../services/supabase.service.js";
 export const adminGetOrganisations = async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -24,7 +24,7 @@ export const getShopsByOrganisation = async (req, res) => {
 
     const { data, error } = await supabaseAdmin
       .from("shops")
-      .select("id, shop_name, block, is_active")
+      .select("id, shop_name, block, is_active,status")
       .eq("organisation_id", orgId)
       .order("shop_name");
 
@@ -503,5 +503,30 @@ export const createShopDraft = async (req, res) => {
     return successResponse(res, data, "Shop draft created successfully", 201);
   } catch (err) {
     return errorResponse(res, err.message, 500);
+  }
+};
+
+export const inviteVendor = async (req, res, next) => {
+  try {
+    const { shopId } = req.params;
+
+    const { data, error } =
+      await supabaseService.inviteVendor(shopId);
+
+    if (error) {
+      return errorResponse(
+        res,
+        error.message,
+        400
+      );
+    }
+
+    return successResponse(
+      res,
+      data,
+      "Vendor invited successfully."
+    );
+  } catch (err) {
+    next(err);
   }
 };

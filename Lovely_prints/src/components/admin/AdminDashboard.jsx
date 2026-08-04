@@ -6,6 +6,7 @@ import {
   getOrganisationAnalytics,
   getShopAnalytics,
   getShopOrders,
+  inviteVendor
 } from "../../services/adminService";
 
 import OrganisationAnalytics from "./OrganisationAnalytics";
@@ -189,6 +190,24 @@ const handleRevenueCalculation = async () => {
     setShops(updated);
   };
 
+  const handleInviteVendor = async (shop) => {
+  try {
+    await inviteVendor(shop.id);
+
+    const updated = await getShopsByOrganisation(
+      selectedOrg.id
+    );
+
+    setShops(updated);
+
+    alert("Invitation sent successfully.");
+  } catch (err) {
+    alert(
+      err?.response?.data?.message ||
+      "Unable to send invitation."
+    );
+  }
+};
   /* ===============================
      UI
   =============================== */
@@ -293,6 +312,22 @@ const handleRevenueCalculation = async () => {
                     </div>
 
                     <div className="shop-card-actions-A">
+                       {shop.status === "draft" && (
+    <button
+      onClick={() => handleInviteVendor(shop)}
+    >
+      Invite Vendor
+    </button>
+  )}
+
+  {shop.status === "invite_sent" && (
+    <button
+      onClick={() => handleInviteVendor(shop)}
+    >
+      Resend Invite
+    </button>
+  )}
+
                       <button
                         onClick={() => handleToggleShopStatus(shop)}
                       >
