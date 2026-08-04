@@ -17,6 +17,8 @@ import { adminGetOrganisations , getShopsByOrganisation , toggleShopStatus , get
   addShopFinishType,
   toggleShopFinishType,
 
+  createShopDraft
+
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -126,6 +128,13 @@ router.patch(
   authMiddleware,
   requireRole("admin"),
   toggleShopFinishType
+);
+
+router.post(
+  "/shops",
+  authMiddleware,
+  requireRole("admin"),
+  createShopDraft
 );
 
 export default router;

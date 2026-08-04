@@ -193,7 +193,8 @@ export const getShopOrders = async (req, res) => {
 
     const { data, error } = await supabaseAdmin
       .from("orders")
-      .select(`
+      .select(
+        `
         id,
         order_no,
         total_price,
@@ -216,7 +217,8 @@ export const getShopOrders = async (req, res) => {
           color_modes ( name ),
           finish_types ( name )
         )
-      `)
+      `,
+      )
       .eq("shop_id", shopId)
       .eq("is_paid", true)
       .order("created_at", { ascending: false });
@@ -412,6 +414,93 @@ export const toggleShopFinishType = async (req, res) => {
 
     if (error) return errorResponse(res, error.message, 400);
     return successResponse(res, data, "Finish type updated");
+  } catch (err) {
+    return errorResponse(res, err.message, 500);
+  }
+};
+
+export const createShopDraft = async (req, res) => {
+  try {
+    const {
+      shop_name,
+      block,
+      organisation_id,
+      owner_name,
+      owner_email,
+      open_time,
+      close_time,
+    } = req.body;
+
+    // Normalize input
+    const normalizedShopName = shop_name?.trim();
+    const normalizedBlock = block?.trim();
+    const normalizedOwnerName = owner_name?.trim();
+    const normalizedOwnerEmail = owner_email?.trim().toLowerCase();
+
+    if (
+      !normalizedShopName ||
+      !normalizedBlock ||
+      !organisation_id ||
+      !normalizedOwnerName ||
+      !normalizedOwnerEmail
+    ) {
+      return errorResponse(res, "Missing required fields", 400);
+    }
+
+    // Check duplicate owner email
+    const { data: existingOwner } = await supabaseAdmin
+      .from("shops")
+      .select("id")
+      .eq("owner_email", normalizedOwnerEmail)
+      .maybeSingle();
+
+    if (existingOwner) {
+      return errorResponse(
+        res,
+        "This owner email is already assigned to another shop.",
+        409,
+      );
+    }
+
+    const { data: existingShop } = await supabaseAdmin
+      .from("shops")
+      .select("id")
+      .eq("organisation_id", organisation_id)
+      .ilike("shop_name", normalizedShopName)
+      .maybeSingle();
+
+    if (existingShop) {
+      return errorResponse(
+        res,
+        "A shop with this name already exists in this organisation.",
+        409,
+      );
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("shops")
+      .insert({
+        shop_name: normalizedShopName,
+        block: normalizedBlock,
+        organisation_id,
+
+        owner_name: normalizedOwnerName,
+        owner_email: normalizedOwnerEmail,
+
+        owner_id: null,
+        status: "draft",
+
+        open_time: open_time || "09:00",
+        close_time: close_time || "17:00",
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return errorResponse(res, error.message, 400);
+    }
+
+    return successResponse(res, data, "Shop draft created successfully", 201);
   } catch (err) {
     return errorResponse(res, err.message, 500);
   }
