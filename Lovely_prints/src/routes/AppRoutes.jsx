@@ -19,6 +19,7 @@ import CreateOrderPage from "../components/student/modals/CreateOrderPage";
 import WalkInOrderPage from "../components/student/modals/WalkInOrderPage";
 import NotFound from "../pages/NotFound";
 import EmailVerified from "../components/auth/EmailVerified";
+import AcceptInvite from "../components/auth/AcceptInvite";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -54,6 +55,10 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
       <Route path="/email-verified" element={<EmailVerified />} />
+      <Route
+        path="/accept-invite"
+        element={<AcceptInvite />}
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

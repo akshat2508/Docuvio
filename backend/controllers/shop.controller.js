@@ -309,3 +309,24 @@ export const updateMyShopAcceptingOrders = async (req, res, next) => {
     next(err);
   }
 };
+
+export const activateMyShop = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const { data, error } =
+      await supabaseService.activateShop(userId);
+
+    if (error) {
+      return errorResponse(res, error.message, 400);
+    }
+
+    return successResponse(
+      res,
+      data,
+      "Shop activated successfully."
+    );
+  } catch (err) {
+    next(err);
+  }
+};

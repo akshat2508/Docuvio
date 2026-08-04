@@ -17,6 +17,9 @@ import { adminGetOrganisations , getShopsByOrganisation , toggleShopStatus , get
   addShopFinishType,
   toggleShopFinishType,
 
+  createShopDraft,
+  inviteVendor
+
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -42,6 +45,14 @@ router.patch(
   requireRole("admin"),
   toggleShopStatus
 );
+
+router.post(
+  "/shops/:shopId/invite",
+  authMiddleware,
+  requireRole("admin"),
+  inviteVendor
+);
+
 router.get(
   "/analytics/:organisationId",
   authMiddleware,
@@ -126,6 +137,13 @@ router.patch(
   authMiddleware,
   requireRole("admin"),
   toggleShopFinishType
+);
+
+router.post(
+  "/shops",
+  authMiddleware,
+  requireRole("admin"),
+  createShopDraft
 );
 
 export default router;
