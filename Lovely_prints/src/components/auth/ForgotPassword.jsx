@@ -22,7 +22,7 @@ export default function ForgotPassword() {
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Password reset email sent. Check your inbox.");
+      setMessage("If an account exists with this email, you'll receive a password reset link shortly.");
     }
 
     setLoading(false);
