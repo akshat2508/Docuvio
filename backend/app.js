@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import webhookRoutes from './routes/webhook.routes.js';
-
+import printSessionRoutes from "./routes/printSession.routes.js";
 import authRoutes from './routes/auth.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import shopRoutes from './routes/shop.routes.js';
@@ -87,7 +87,10 @@ app.get('/health', (req, res) => {
 app.use('/api/webhooks', webhookRoutes);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(
+  "/api/print-sessions",
+  printSessionRoutes
+);
 app.use('/api/auth',authLimiter, authRoutes);
 app.use("/api/auth", authRoutes);
 app.use('/api/students',pollingLimiter, studentRoutes);
