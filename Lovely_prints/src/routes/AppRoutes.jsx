@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../components/auth/Login";
 import Signup from "../components/auth/Signup";
-
+import PrintSessionPage from "../components/printSession/PrintSessionPage";
 import StudentLayout from "../components/student/layout/StudentLayout";
 import StudentHome from "../components/student/pages/StudentHome";
 import ShopDetails from "../components/student/pages/ShopDetails";
@@ -29,6 +29,11 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/update-password" element={<ResetPassword />} />
+        {/* PRINT SESSION */}
+      <Route
+        path="/print-session/:sessionToken"
+        element={<PrintSessionPage />}
+      />
 
       {/* Student (Protected) */}
       <Route element={<ProtectedRoute role="student" />}>

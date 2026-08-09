@@ -58,3 +58,35 @@ export const getSessionFileUrl = async (
 
   return res.data.data.url;
 };
+
+// ==========================================
+// CUSTOMER DETAILS
+// ==========================================
+
+export const submitCustomerDetails = async (
+  sessionToken,
+  customerName,
+  customerPhone
+) => {
+  const res = await api.post(
+    `/print-sessions/session/${sessionToken}/customer`,
+    {
+      customer_name: customerName,
+      customer_phone: customerPhone,
+    }
+  );
+
+  return res.data;
+};
+
+// ==========================================
+// SESSION
+// ==========================================
+
+export const getPrintSession = async (sessionToken) => {
+  const res = await api.get(
+    `/print-sessions/session/${sessionToken}`
+  );
+
+  return res.data;
+};
