@@ -74,6 +74,16 @@ const ShopNavbar = ({
           >
             Analytics
           </button>
+          <button
+  className={
+    activeTab === "print-sessions"
+      ? "active"
+      : ""
+  }
+  onClick={() => setActiveTab("print-sessions")}
+>
+  Print Sessions
+</button>
         </div>
 
         {/* RIGHT */}

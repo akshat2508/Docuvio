@@ -17,6 +17,10 @@ import {
   uploadSessionFile,
   getSessionFiles,
   getSessionFileUrl,
+    getShopPrintSessions,
+  startSessionReview,
+  submitSessionQuote,
+  getSessionQuote,
 } from "../controllers/printSession.controller.js";
 import upload from "../middleware/upload.middleware.js";
 
@@ -127,6 +131,32 @@ router.post(
   authMiddleware,
   requireRole("shop_owner"),
   setPrintSessionQuote
+);
+
+router.get(
+  "/shop/sessions",
+  authMiddleware,
+  requireRole("shop_owner"),
+  getShopPrintSessions
+);
+
+router.post(
+  "/session/:sessionToken/review",
+  authMiddleware,
+  requireRole("shop_owner"),
+  startSessionReview
+);
+
+router.post(
+  "/session/:sessionToken/quote",
+  authMiddleware,
+  requireRole("shop_owner"),
+  submitSessionQuote
+);
+
+router.get(
+  "/session/:sessionToken/quote",
+  getSessionQuote
 );
 
 

@@ -662,6 +662,100 @@ async markFilesUploaded(sessionId) {
 }
 
 
+async getSessionForShop(sessionToken, shopId) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .select(`
+      id,
+      shop_id,
+      organisation_id,
+      session_token,
+      customer_name,
+      customer_phone,
+      status,
+      quoted_amount,
+      quoted_at,
+      expires_at,
+      created_at,
+      updated_at,
+
+      print_session_files (
+        id,
+        file_name,
+        file_key,
+        file_size,
+        mime_type,
+        created_at
+      )
+    `)
+    .eq("session_token", sessionToken)
+    .eq("shop_id", shopId)
+    .single();
+}
+
+async getActiveSessionsForShop(shopId) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .select(`
+      id,
+      shop_id,
+      organisation_id,
+      session_token,
+      customer_name,
+      customer_phone,
+      status,
+      quoted_amount,
+      quoted_at,
+      expires_at,
+      created_at,
+      updated_at
+    `)
+    .eq("shop_id", shopId)
+    .in("status", [
+      "connected",
+      "customer_details",
+      "files_uploading",
+      "files_uploaded",
+      "reviewing",
+      "quote_ready",
+      "payment_pending"
+    ])
+    .order("created_at", {
+      ascending: false,
+    });
+}
+
+
+async createSessionQuote(sessionToken, shopId, quotedAmount) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .update({
+      quoted_amount: quotedAmount,
+      quoted_at: new Date().toISOString(),
+      status: "quote_ready",
+    })
+    .eq("session_token", sessionToken)
+    .eq("shop_id", shopId)
+    .select()
+    .single();
+}
+
+
+async markSessionReviewing(sessionToken, shopId) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .update({
+      status: "reviewing",
+    })
+    .eq("session_token", sessionToken)
+    .eq("shop_id", shopId)
+    .select()
+    .single();
+}
+
+
+
+
 }
 
 export default new PrintSessionService();

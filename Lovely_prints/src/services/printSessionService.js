@@ -90,3 +90,53 @@ export const getPrintSession = async (sessionToken) => {
 
   return res.data;
 };
+
+// ==========================================
+// SHOP PRINT SESSIONS
+// ==========================================
+
+export const getShopPrintSessions = async () => {
+  const res = await api.get(
+    "/print-sessions/shop/sessions"
+  );
+
+  return res.data;
+};
+
+export const startSessionReview = async (
+  sessionToken
+) => {
+  const res = await api.post(
+    `/print-sessions/session/${sessionToken}/review`
+  );
+
+  return res.data;
+};
+
+export const submitSessionQuote = async (
+  sessionToken,
+  quotedAmount
+) => {
+  const res = await api.post(
+    `/print-sessions/session/${sessionToken}/quote`,
+    {
+      quoted_amount: Number(quotedAmount),
+    }
+  );
+
+  return res.data;
+};
+
+// ==========================================
+// CUSTOMER QUOTE
+// ==========================================
+
+export const getSessionQuote = async (
+  sessionToken
+) => {
+  const res = await api.get(
+    `/print-sessions/session/${sessionToken}/quote`
+  );
+
+  return res.data;
+};

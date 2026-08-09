@@ -3,7 +3,7 @@ import {
   isValidPrintSessionTransition,
 } from "../utils/printSessionStatus.js";
 import { successResponse, errorResponse } from "../utils/response.js";
-
+import supabaseService from "../services/supabase.service.js";
 import storageService
   from "../services/storage.service.js";
 
@@ -845,5 +845,219 @@ export const getSessionFileUrl = async (
 
   } catch (err) {
     next(err);
+  }
+};
+
+export const getShopPrintSessions = async (req, res, next) => {
+  try {
+    const shopId = req.user.shop_id;
+
+    if (!shopId) {
+      return errorResponse(
+        res,
+        "Shop not found for current user",
+        404
+      );
+    }
+
+    const { data, error } =
+      await printSessionService.getActiveSessionsForShop(
+        shopId
+      );
+
+    if (error) {
+      return errorResponse(res, error.message, 400);
+    }
+
+    return successResponse(
+      res,
+      data,
+      "Print sessions fetched successfully"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// const { data: shop, error: shopError } =
+//   await supabaseService.getShopByOwner(req.user.id);
+
+// if (shopError || !shop) {
+//   return errorResponse(res, "Shop not found", 404);
+// }
+
+// const shopId = shop.id;
+
+
+export const startSessionReview = async (req, res, next) => {
+  try {
+    const { sessionToken } = req.params;
+
+    const { data: shop, error: shopError } =
+      await supabaseService.getShopByOwner(req.user.id);
+
+    if (shopError || !shop) {
+      return errorResponse(res, "Shop not found", 404);
+    }
+
+    const { data: session, error: sessionError } =
+      await printSessionService.getSessionForShop(
+        sessionToken,
+        shop.id
+      );
+
+    if (sessionError || !session) {
+      return errorResponse(
+        res,
+        "Print session not found",
+        404
+      );
+    }
+
+    if (
+      !isValidPrintSessionTransition(
+        session.status,
+        "reviewing"
+      )
+    ) {
+      return errorResponse(
+        res,
+        `Cannot start review from status ${session.status}`,
+        400
+      );
+    }
+
+    const { data, error } =
+      await printSessionService.markSessionReviewing(
+        sessionToken,
+        shop.id
+      );
+
+    if (error) {
+      return errorResponse(
+        res,
+        error.message,
+        400
+      );
+    }
+
+    return successResponse(
+      res,
+      data,
+      "Session opened for review"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const submitSessionQuote = async (req, res, next) => {
+  try {
+    const { sessionToken } = req.params;
+    const { quoted_amount } = req.body;
+
+    const amount = Number(quoted_amount);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return errorResponse(
+        res,
+        "Valid quotation amount is required",
+        400
+      );
+    }
+
+    const { data: shop, error: shopError } =
+      await supabaseService.getShopByOwner(req.user.id);
+
+    if (shopError || !shop) {
+      return errorResponse(
+        res,
+        "Shop not found",
+        404
+      );
+    }
+
+    const { data: session, error: sessionError } =
+      await printSessionService.getSessionForShop(
+        sessionToken,
+        shop.id
+      );
+
+    if (sessionError || !session) {
+      return errorResponse(
+        res,
+        "Print session not found",
+        404
+      );
+    }
+
+    if (
+      !isValidPrintSessionTransition(
+        session.status,
+        "quote_ready"
+      )
+    ) {
+      return errorResponse(
+        res,
+        `Cannot submit quotation from status ${session.status}`,
+        400
+      );
+    }
+
+    const { data, error } =
+      await printSessionService.createSessionQuote(
+        sessionToken,
+        shop.id,
+        amount
+      );
+
+    if (error) {
+      return errorResponse(
+        res,
+        error.message,
+        400
+      );
+    }
+
+    return successResponse(
+      res,
+      data,
+      "Quotation sent successfully"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSessionQuote = async (req, res, next) => {
+  try {
+    const { sessionToken } = req.params;
+
+    const { data, error } =
+      await printSessionService.getSessionByToken(
+        sessionToken
+      );
+
+    if (error || !data) {
+      return errorResponse(
+        res,
+        "Print session not found",
+        404
+      );
+    }
+
+    return successResponse(
+      res,
+      {
+        session_token: data.session_token,
+        status: data.status,
+        quoted_amount: data.quoted_amount,
+        quoted_at: data.quoted_at,
+      },
+      "Session quotation fetched"
+    );
+  } catch (error) {
+    next(error);
   }
 };
