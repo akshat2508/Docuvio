@@ -6,6 +6,8 @@ import { successResponse, errorResponse } from "../utils/response.js";
 import supabaseService from "../services/supabase.service.js";
 import storageService
   from "../services/storage.service.js";
+import crypto from "crypto";
+import paymentService from "../services/payment.service.js";
 
 /**
  * ---------------------------------------------------------
@@ -1056,6 +1058,262 @@ export const getSessionQuote = async (req, res, next) => {
         quoted_at: data.quoted_at,
       },
       "Session quotation fetched"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createSessionPaymentOrder = async (req, res, next) => {
+  try {
+    const { sessionToken } = req.params;
+
+    if (!sessionToken) {
+      return errorResponse(
+        res,
+        "Session token is required",
+        400
+      );
+    }
+
+    // 1. Fetch session
+    const { data: session, error: sessionError } =
+      await printSessionService.getSessionForPayment(sessionToken);
+
+    if (sessionError || !session) {
+      return errorResponse(
+        res,
+        "Print session not found",
+        404
+      );
+    }
+
+    // 2. Session must be ready for payment
+    if (session.status !== "quote_ready") {
+      return errorResponse(
+        res,
+        `Cannot create payment from status ${session.status}`,
+        400
+      );
+    }
+
+    // 3. Validate quotation
+    const quotedAmount = Number(session.quoted_amount);
+
+    if (!quotedAmount || quotedAmount <= 0) {
+      return errorResponse(
+        res,
+        "Invalid session quotation",
+        400
+      );
+    }
+
+    // 4. Check if an existing payment already exists
+    const { data: existingPayment } =
+      await printSessionService.getSessionPaymentBySession(
+        session.id
+      );
+
+    if (
+      existingPayment &&
+      ["payment_pending", "success"].includes(
+        existingPayment.status
+      )
+    ) {
+      return successResponse(
+        res,
+        {
+          payment: existingPayment,
+        },
+        "Existing session payment found"
+      );
+    }
+
+    // 5. Create Razorpay order
+    const razorpayOrder =
+      await paymentService.createOrder(
+        quotedAmount,
+        `session_${session.session_token}`
+      );
+
+    // 6. Store payment
+    const { data: payment, error: paymentError } =
+      await printSessionService.createSessionPayment({
+        session_id: session.id,
+        session_token: session.session_token,
+        shop_id: session.shop_id,
+        organisation_id: session.organisation_id,
+        amount: quotedAmount,
+        razorpay_order_id: razorpayOrder.id,
+        status: "payment_pending",
+      });
+
+    if (paymentError) {
+      console.error(
+        "Session payment DB error:",
+        paymentError
+      );
+
+      return errorResponse(
+        res,
+        "Failed to create session payment",
+        500
+      );
+    }
+
+    // 7. Move session to payment_pending
+    const { error: statusError } =
+      await printSessionService.markSessionPaymentPending(
+        session.session_token
+      );
+
+    if (statusError) {
+      console.error(
+        "Session status update failed:",
+        statusError
+      );
+
+      return errorResponse(
+        res,
+        "Failed to update session payment status",
+        500
+      );
+    }
+
+    return successResponse(
+      res,
+      {
+        paymentId: payment.id,
+        sessionToken: session.session_token,
+        amount: quotedAmount,
+        razorpayOrderId: razorpayOrder.id,
+        currency: "INR",
+      },
+      "Session payment order created"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifySessionPayment = async (req, res, next) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = req.body;
+
+    if (
+      !razorpay_order_id ||
+      !razorpay_payment_id ||
+      !razorpay_signature
+    ) {
+      return errorResponse(
+        res,
+        "Incomplete payment response",
+        400
+      );
+    }
+
+    // 1. Get payment from OUR database
+    const { data: payment, error: paymentError } =
+      await printSessionService.getSessionPaymentByRazorpayOrder(
+        razorpay_order_id
+      );
+
+    if (paymentError || !payment) {
+      return errorResponse(
+        res,
+        "Session payment not found",
+        404
+      );
+    }
+
+    // 2. Idempotency
+    if (payment.status === "success") {
+      return successResponse(
+        res,
+        {
+          sessionToken: payment.session_token,
+          status: "paid",
+        },
+        "Payment already verified"
+      );
+    }
+
+    // 3. Verify signature
+    const body =
+      payment.razorpay_order_id +
+      "|" +
+      razorpay_payment_id;
+
+    const expectedSignature =
+      crypto
+        .createHmac(
+          "sha256",
+          process.env.RAZORPAY_KEY_SECRET
+        )
+        .update(body)
+        .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return errorResponse(
+        res,
+        "Payment verification failed",
+        400
+      );
+    }
+
+    // 4. Mark payment success
+    const { error: updateError } =
+      await supabaseService.markSessionPaymentSuccess(
+        payment.razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
+
+    if (updateError) {
+      console.error(
+        "Session payment update failed:",
+        updateError
+      );
+
+      return errorResponse(
+        res,
+        "Failed to update payment",
+        500
+      );
+    }
+
+    // 5. Mark session paid
+    const { error: sessionError } =
+      await printSessionService.markSessionPaid(
+        payment.session_token
+      );
+
+    if (sessionError) {
+      console.error(
+        "Session paid update failed:",
+        sessionError
+      );
+
+      return errorResponse(
+        res,
+        "Failed to update session",
+        500
+      );
+    }
+
+    return successResponse(
+      res,
+      {
+        sessionToken: payment.session_token,
+        status: "paid",
+        amount: payment.amount,
+        razorpayPaymentId: razorpay_payment_id,
+      },
+      "Session payment successful"
     );
   } catch (error) {
     next(error);

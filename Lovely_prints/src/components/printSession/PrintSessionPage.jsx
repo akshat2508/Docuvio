@@ -11,7 +11,7 @@ import {
 } from "../../services/printSessionService";
 
 import "./printSession.css";
-
+import SessionQuotation from "../student/printSession/SessionQuotation";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const ALLOWED_TYPES = [
@@ -784,8 +784,41 @@ const PrintSessionPage = () => {
                 </div>
               )}
 
+
+
             </div>
           </div>
+          {session?.status === "quote_ready" && (
+            <SessionQuotation
+                session={session}
+                onPaid={(payment) => {
+                setSession((prev) => ({
+                    ...prev,
+                    status: "paid",
+                }));
+                }}
+            />
+            )}
+
+            {session?.status === "payment_pending" && (
+            <div className="session-payment-pending">
+                <h3>Payment Pending</h3>
+                <p>
+                Your payment is being processed.
+                </p>
+            </div>
+            )}
+
+            {session?.status === "paid" && (
+            <div className="session-payment-success">
+                <h3>Payment Successful ✓</h3>
+                <p>
+                Your print order has been paid.
+                The shop can now begin printing.
+                </p>
+            </div>
+            )}
+
         </div>
       )}
     </>

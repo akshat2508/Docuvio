@@ -6,6 +6,7 @@ import ShopFallBack from "../assets/shop.png";
 import OpenPoliciesModal from "../modals/OpenPoliciesModal";
 
 import "./studentHome.css";
+import PaymentTest from "../printSession/PaymentTest";
 
 const StudentHome = () => {
   const navigate = useNavigate();
@@ -83,6 +84,7 @@ const getShopBanner = (shop) => {
 };
   return (
     <div className="student-home">
+      <PaymentTest/>
 
       <h1 className="student-home-title">Choose a Print Shop</h1>
 

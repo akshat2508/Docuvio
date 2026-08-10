@@ -753,6 +753,91 @@ async markSessionReviewing(sessionToken, shopId) {
     .single();
 }
 
+async getSessionForPayment(sessionToken) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .select(`
+      id,
+      shop_id,
+      organisation_id,
+      session_token,
+      status,
+      quoted_amount,
+      quoted_at,
+      expires_at
+    `)
+    .eq("session_token", sessionToken)
+    .single();
+}
+
+async createSessionPayment(data) {
+  return await supabaseAdmin
+    .from("session_payments")
+    .insert(data)
+    .select()
+    .single();
+}
+
+async getSessionPaymentBySession(sessionId) {
+  return await supabaseAdmin
+    .from("session_payments")
+    .select("*")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+}
+
+async markSessionPaymentSuccess(
+  razorpayOrderId,
+  razorpayPaymentId,
+  razorpaySignature
+) {
+  return await supabaseAdmin
+    .from("session_payments")
+    .update({
+      status: "success",
+      razorpay_payment_id: razorpayPaymentId,
+      razorpay_signature: razorpaySignature,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("razorpay_order_id", razorpayOrderId);
+}
+
+async getSessionPaymentByRazorpayOrder(razorpayOrderId) {
+  return await supabaseAdmin
+    .from("session_payments")
+    .select("*")
+    .eq("razorpay_order_id", razorpayOrderId)
+    .single();
+}
+
+async markSessionPaymentPending(sessionToken) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .update({
+      status: "payment_pending",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("session_token", sessionToken)
+    .eq("status", "quote_ready")
+    .select()
+    .single();
+}
+
+async markSessionPaid(sessionToken) {
+  return await supabaseAdmin
+    .from("print_sessions")
+    .update({
+      status: "paid",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("session_token", sessionToken)
+    .eq("status", "payment_pending")
+    .select()
+    .single();
+}
+
 
 
 

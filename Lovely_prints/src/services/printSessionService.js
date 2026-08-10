@@ -140,3 +140,29 @@ export const getSessionQuote = async (
 
   return res.data;
 };
+
+// ==========================================
+// SESSION PAYMENT
+// ==========================================
+
+export const createSessionPaymentOrder = async (
+  sessionToken
+) => {
+  const res = await api.post(
+    `/print-sessions/session/${sessionToken}/payment/create`
+  );
+
+  return res.data;
+};
+
+export const verifySessionPayment = async (
+  payload
+) => {
+  const res = await api.post(
+    "/print-sessions/session/payment/verify",
+    payload
+  );
+
+  return res.data;
+};
+

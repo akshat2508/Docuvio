@@ -21,6 +21,8 @@ import {
   startSessionReview,
   submitSessionQuote,
   getSessionQuote,
+  createSessionPaymentOrder,
+  verifySessionPayment
 } from "../controllers/printSession.controller.js";
 import upload from "../middleware/upload.middleware.js";
 
@@ -157,6 +159,16 @@ router.post(
 router.get(
   "/session/:sessionToken/quote",
   getSessionQuote
+);
+
+router.post(
+  "/session/:sessionToken/payment/create",
+  createSessionPaymentOrder
+);
+
+router.post(
+  "/session/payment/verify",
+  verifySessionPayment
 );
 
 
