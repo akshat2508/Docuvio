@@ -1069,11 +1069,7 @@ export const createSessionPaymentOrder = async (req, res, next) => {
     const { sessionToken } = req.params;
 
     if (!sessionToken) {
-      return errorResponse(
-        res,
-        "Session token is required",
-        400
-      );
+      return errorResponse(res, "Session token is required", 400);
     }
 
     // 1. Fetch session
@@ -1081,44 +1077,16 @@ export const createSessionPaymentOrder = async (req, res, next) => {
       await printSessionService.getSessionForPayment(sessionToken);
 
     if (sessionError || !session) {
-      return errorResponse(
-        res,
-        "Print session not found",
-        404
-      );
+      return errorResponse(res, "Print session not found", 404);
     }
 
-    // 2. Session must be ready for payment
-    if (session.status !== "quote_ready") {
-      return errorResponse(
-        res,
-        `Cannot create payment from status ${session.status}`,
-        400
-      );
-    }
-
-    // 3. Validate quotation
-    const quotedAmount = Number(session.quoted_amount);
-
-    if (!quotedAmount || quotedAmount <= 0) {
-      return errorResponse(
-        res,
-        "Invalid session quotation",
-        400
-      );
-    }
-
-    // 4. Check if an existing payment already exists
+    // 2. FIRST check for an existing payment
     const { data: existingPayment } =
-      await printSessionService.getSessionPaymentBySession(
-        session.id
-      );
+      await printSessionService.getSessionPaymentBySession(session.id);
 
     if (
       existingPayment &&
-      ["payment_pending", "success"].includes(
-        existingPayment.status
-      )
+      ["payment_pending", "captured"].includes(existingPayment.status)
     ) {
       return successResponse(
         res,
@@ -1129,14 +1097,29 @@ export const createSessionPaymentOrder = async (req, res, next) => {
       );
     }
 
-    // 5. Create Razorpay order
-    const razorpayOrder =
-      await paymentService.createOrder(
-        quotedAmount,
-        `session_${session.session_token}`
+    // 3. Only a quote_ready session can create a NEW payment
+    if (session.status !== "quote_ready") {
+      return errorResponse(
+        res,
+        `Cannot create payment from status ${session.status}`,
+        400
       );
+    }
 
-    // 6. Store payment
+    // 4. Validate quotation
+    const quotedAmount = Number(session.quoted_amount);
+
+    if (!quotedAmount || quotedAmount <= 0) {
+      return errorResponse(res, "Invalid session quotation", 400);
+    }
+
+    // 5. Create Razorpay order
+    const razorpayOrder = await paymentService.createOrder(
+      quotedAmount,
+      `session_${session.session_token}`
+    );
+
+    // 6. Save payment
     const { data: payment, error: paymentError } =
       await printSessionService.createSessionPayment({
         session_id: session.id,
@@ -1149,10 +1132,7 @@ export const createSessionPaymentOrder = async (req, res, next) => {
       });
 
     if (paymentError) {
-      console.error(
-        "Session payment DB error:",
-        paymentError
-      );
+      console.error("Session payment DB error:", paymentError);
 
       return errorResponse(
         res,
@@ -1181,21 +1161,22 @@ export const createSessionPaymentOrder = async (req, res, next) => {
     }
 
     return successResponse(
-      res,
-      {
-        paymentId: payment.id,
-        sessionToken: session.session_token,
-        amount: quotedAmount,
-        razorpayOrderId: razorpayOrder.id,
-        currency: "INR",
-      },
-      "Session payment order created"
-    );
+  res,
+  {
+    payment: {
+      id: payment.id,
+      session_token: session.session_token,
+      amount: quotedAmount,
+      razorpay_order_id: razorpayOrder.id,
+      currency: "INR",
+    },
+  },
+  "Session payment order created"
+);
   } catch (error) {
     next(error);
   }
 };
-
 export const verifySessionPayment = async (req, res, next) => {
   try {
     const {

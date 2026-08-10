@@ -791,17 +791,22 @@ async getSessionPaymentBySession(sessionId) {
 async markSessionPaymentSuccess(
   razorpayOrderId,
   razorpayPaymentId,
-  razorpaySignature
+  razorpaySignature = null,
+  webhookPayload = null
 ) {
   return await supabaseAdmin
     .from("session_payments")
     .update({
-      status: "success",
+      status: "captured",
       razorpay_payment_id: razorpayPaymentId,
       razorpay_signature: razorpaySignature,
+      webhook_payload: webhookPayload,
       updated_at: new Date().toISOString(),
     })
-    .eq("razorpay_order_id", razorpayOrderId);
+    .eq(
+      "razorpay_order_id",
+      razorpayOrderId
+    );
 }
 
 async getSessionPaymentByRazorpayOrder(razorpayOrderId) {
@@ -809,7 +814,7 @@ async getSessionPaymentByRazorpayOrder(razorpayOrderId) {
     .from("session_payments")
     .select("*")
     .eq("razorpay_order_id", razorpayOrderId)
-    .single();
+    .maybeSingle();
 }
 
 async markSessionPaymentPending(sessionToken) {

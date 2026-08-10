@@ -68,11 +68,11 @@ export const submitCustomerDetails = async (
   customerName,
   customerPhone
 ) => {
-  const res = await api.post(
+  const res = await api.patch(
     `/print-sessions/session/${sessionToken}/customer`,
     {
-      customer_name: customerName,
-      customer_phone: customerPhone,
+      customerName: customerName,
+      customerPhone: customerPhone,
     }
   );
 
