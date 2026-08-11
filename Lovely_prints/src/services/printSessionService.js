@@ -166,7 +166,13 @@ export const verifySessionPayment = async (
   return res.data;
 };
 
+export const startPrintSession = async (shopId) => {
+  const res = await api.post(
+    `/print-sessions/shop/${shopId}/start`
+  );
 
+  return res.data;
+};
 
 export const connectPrintSession = async (sessionToken) => {
   const res = await api.post(

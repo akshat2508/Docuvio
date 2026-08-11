@@ -1,0 +1,170 @@
+.print-session-start-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f6f7f9;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.print-session-start-card {
+  width: min(560px, 100%);
+  background: #fff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+
+  padding: 42px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.print-session-start-eyebrow {
+  margin-bottom: 12px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 1.5px;
+
+  color: #777;
+}
+
+.print-session-start-card h1 {
+  margin: 0;
+
+  font-size: 36px;
+  line-height: 1.15;
+
+  color: #171717;
+}
+
+.print-session-start-description {
+  margin: 14px 0 30px;
+
+  font-size: 15px;
+  line-height: 1.6;
+
+  color: #6b7280;
+}
+
+.print-session-start-steps {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+
+  margin-bottom: 28px;
+}
+
+.start-step {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+}
+
+.start-step > span {
+  width: 32px;
+  height: 32px;
+
+  min-width: 32px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #111827;
+  color: white;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.start-step strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 14px;
+  color: #171717;
+}
+
+.start-step p {
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #6b7280;
+}
+
+.print-session-start-error {
+  padding: 12px 14px;
+
+  margin-bottom: 16px;
+
+  border-radius: 10px;
+
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+
+  color: #b91c1c;
+
+  font-size: 13px;
+}
+
+.print-session-start-button {
+  width: 100%;
+
+  border: 0;
+  border-radius: 11px;
+
+  padding: 14px 20px;
+
+  background: #111827;
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.print-session-start-button:hover {
+  background: #1f2937;
+}
+
+.print-session-start-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.print-session-start-note {
+  margin: 14px 0 0;
+
+  text-align: center;
+
+  font-size: 12px;
+
+  color: #9ca3af;
+}
+
+@media (max-width: 600px) {
+  .print-session-start-page {
+    padding: 20px 14px;
+  }
+
+  .print-session-start-card {
+    padding: 28px 22px;
+  }
+
+  .print-session-start-card h1 {
+    font-size: 30px;
+  }
+}

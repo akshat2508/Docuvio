@@ -20,6 +20,7 @@ import WalkInOrderPage from "../components/student/modals/WalkInOrderPage";
 import NotFound from "../pages/NotFound";
 import EmailVerified from "../components/auth/EmailVerified";
 import AcceptInvite from "../components/auth/AcceptInvite";
+import PrintSessionStart from "../pages/printSession/PrintSessionStart";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -30,6 +31,10 @@ const AppRoutes = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/update-password" element={<ResetPassword />} />
         {/* PRINT SESSION */}
+        <Route
+            path="/print/shop/:shopId"
+            element={<PrintSessionStart/>}
+          />
       <Route
         path="/print-session/:sessionToken"
         element={<PrintSessionPage />}
