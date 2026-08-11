@@ -903,3 +903,238 @@
 .image-download-btn:hover {
   background: #1f2937;
 }
+
+/* ============================================================
+   QUOTATION
+   ============================================================ */
+
+.quotation-section {
+  background: #ffffff;
+}
+
+.quotation-start-card {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  background: #f9fafb;
+}
+
+.quotation-start-card strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 14px;
+
+  color: #111827;
+}
+
+.quotation-start-card p {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+}
+
+.review-primary-btn {
+  flex-shrink: 0;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  padding: 11px 18px;
+
+  background: #111827;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.review-primary-btn:hover {
+  background: #1f2937;
+}
+
+.review-primary-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* ================= QUOTE FORM ================= */
+
+.quotation-form {
+  padding: 20px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  background: #fafafa;
+}
+
+.quotation-amount-field {
+  max-width: 360px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.quotation-amount-field label {
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.quotation-input-wrapper {
+  display: flex;
+
+  align-items: center;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+}
+
+.quotation-input-wrapper:focus-within {
+  border-color: #111827;
+
+  box-shadow:
+    0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.quotation-input-wrapper span {
+  padding-left: 14px;
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.quotation-input-wrapper input {
+  width: 100%;
+
+  border: 0;
+
+  outline: 0;
+
+  padding: 13px 12px;
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #111827;
+
+  background: transparent;
+}
+
+/* Remove number input arrows */
+
+.quotation-input-wrapper input::-webkit-outer-spin-button,
+.quotation-input-wrapper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+
+  margin: 0;
+}
+
+.quotation-input-wrapper input[type="number"] {
+  appearance: textfield;
+}
+
+.quotation-help {
+  margin: 9px 0 18px;
+
+  font-size: 12px;
+
+  color: #6b7280;
+}
+
+.quotation-submit-btn {
+  border: 0;
+
+  border-radius: 9px;
+
+  padding: 11px 18px;
+
+  background: #111827;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.quotation-submit-btn:hover {
+  background: #1f2937;
+}
+
+.quotation-submit-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* ================= SUCCESS ================= */
+
+.review-success {
+  margin: 20px 30px 0;
+
+  padding: 12px 14px;
+
+  border-radius: 9px;
+
+  background: #ecfdf5;
+
+  border: 1px solid #a7f3d0;
+
+  color: #047857;
+
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .quotation-start-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .review-primary-btn {
+    width: 100%;
+  }
+
+  .quotation-submit-btn {
+    width: 100%;
+  }
+}
