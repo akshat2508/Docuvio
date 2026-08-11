@@ -9,6 +9,7 @@ import {
 } from "../../../services/printSessionService";
 
 import "./printSessions.css";
+import { createPortal } from "react-dom";
 
 /* =========================================================
    HELPERS
@@ -417,7 +418,7 @@ const PrintSessionReview = ({
      RENDER
   ======================================================= */
 
-  return (
+  return createPortal(
     <div className="print-session-review-overlay">
 
       <div className="print-session-review-modal">
@@ -1285,7 +1286,7 @@ const PrintSessionReview = ({
 
       )}
 
-    </div>
+    </div>,document.getElementById("modal-root")
   );
 };
 

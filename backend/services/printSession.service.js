@@ -718,7 +718,8 @@ async getActiveSessionsForShop(shopId) {
       "files_uploaded",
       "reviewing",
       "quote_ready",
-      "payment_pending"
+      "payment_pending",
+      "paid"
     ])
     .order("created_at", {
       ascending: false,
