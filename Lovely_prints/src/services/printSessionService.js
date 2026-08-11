@@ -166,3 +166,12 @@ export const verifySessionPayment = async (
   return res.data;
 };
 
+
+
+export const connectPrintSession = async (sessionToken) => {
+  const res = await api.post(
+    `/print-sessions/session/${sessionToken}/connect`
+  );
+
+  return res.data;
+};

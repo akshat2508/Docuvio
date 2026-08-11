@@ -17,8 +17,7 @@ import ShopNavbar from "./ShopNavbar";
 import EmptyShopOrders from "./EmptyShopOrders";
 import { supabase } from "../../services/supabase";
 import LoggingOutOverlay from "../common/LoggingOutOverlay";
-
-
+import PrintSessionsPage from "./PrintSessions/PrintSessionsPage";
 
 const normalizeDate = (d) => {
   const x = new Date(d);
@@ -674,6 +673,7 @@ const discardedOrders = orders.filter(
 
       {activeTab === "settings" && <PricingSettings />}
       {activeTab === "analytics" && <ShopAnalytics orders={orders} />}
+      {activeTab === "print-sessions" && <PrintSessionsPage />}
       <audio
         ref={notificationAudioRef}
         src="/notification.mp3"

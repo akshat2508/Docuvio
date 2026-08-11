@@ -852,23 +852,34 @@ export const getSessionFileUrl = async (
 
 export const getShopPrintSessions = async (req, res, next) => {
   try {
-    const shopId = req.user.shop_id;
+    const userId = req.user.id;
 
-    if (!shopId) {
+    const {
+      data: shop,
+      error: shopError,
+    } = await supabaseService.getShopByOwner(userId);
+
+    if (shopError || !shop) {
       return errorResponse(
         res,
-        "Shop not found for current user",
+        "Shop not found for owner",
         404
       );
     }
 
-    const { data, error } =
-      await printSessionService.getActiveSessionsForShop(
-        shopId
-      );
+    const {
+      data,
+      error,
+    } = await printSessionService.getActiveSessionsForShop(
+      shop.id
+    );
 
     if (error) {
-      return errorResponse(res, error.message, 400);
+      return errorResponse(
+        res,
+        error.message,
+        400
+      );
     }
 
     return successResponse(

@@ -3,72 +3,121 @@ import { startSessionPayment } from "./sessionPayment";
 
 const SessionQuotation = ({
   session,
-  onPaid,
+  onPaymentStarted,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const amount = Number(session?.quoted_amount || 0);
+
   const handlePayment = async () => {
-    if (!session?.quoted_amount) return;
+    if (!amount || amount <= 0 || loading) {
+      return;
+    }
 
-    setLoading(true);
-    setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-    await startSessionPayment({
-      sessionToken: session.session_token,
+      await startSessionPayment({
+        sessionToken: session.session_token,
 
-      customerName:
-        session.customer_name || "",
+        customerName:
+          session.customer_name || "",
 
-      customerPhone:
-        session.customer_phone || "",
+        customerPhone:
+          session.customer_phone || "",
 
-      onSuccess: (data) => {
-        setLoading(false);
-        onPaid?.(data);
-      },
+        onSuccess: () => {
+          /*
+           * IMPORTANT:
+           *
+           * Razorpay Checkout success does NOT
+           * mean the database says "paid".
+           *
+           * The webhook is authoritative.
+           *
+           * We only move the UI to
+           * payment_pending here.
+           */
+          setLoading(false);
 
-      onFailure: (message) => {
-        setLoading(false);
-        setError(message);
-      },
-    });
+          onPaymentStarted?.();
+        },
+
+        onFailure: (message) => {
+          setLoading(false);
+
+          setError(
+            message ||
+              "Payment was not completed. Please try again."
+          );
+        },
+      });
+    } catch (err) {
+      console.error(
+        "Payment initialization error:",
+        err
+      );
+
+      setLoading(false);
+
+      setError(
+        err?.message ||
+          "Unable to start payment."
+      );
+    }
   };
 
   return (
-    <section className="session-quotation-card">
-      <div>
-        <span>SHOP QUOTATION</span>
+    <section className="session-card session-quotation-card">
 
-        <h2>
-          ₹{Number(
-            session.quoted_amount
-          ).toFixed(2)}
-        </h2>
+      <div className="quotation-header">
+        <div>
+          <span className="state-eyebrow">
+            QUOTATION READY
+          </span>
 
-        <p>
-          This is the final amount provided
-          by the print shop.
-        </p>
+          <h2>
+            Your print quotation
+          </h2>
+
+          <p>
+            The print shop has reviewed your
+            documents and provided the final amount.
+          </p>
+        </div>
+      </div>
+
+      <div className="quotation-amount">
+        <span>Final amount</span>
+
+        <strong>
+          ₹{amount.toFixed(2)}
+        </strong>
       </div>
 
       {error && (
-        <div className="session-payment-error">
+        <div className="session-alert session-alert-error">
           {error}
         </div>
       )}
 
       <button
         type="button"
+        className="session-primary-btn quotation-pay-btn"
         onClick={handlePayment}
-        disabled={loading}
+        disabled={loading || !amount}
       >
         {loading
-          ? "Preparing Payment..."
-          : `Pay ₹${Number(
-              session.quoted_amount
-            ).toFixed(2)}`}
+          ? "Opening Payment..."
+          : `Pay ₹${amount.toFixed(2)}`}
       </button>
+
+      <p className="quotation-note">
+        You'll be redirected to Razorpay's secure
+        checkout.
+      </p>
     </section>
   );
 };

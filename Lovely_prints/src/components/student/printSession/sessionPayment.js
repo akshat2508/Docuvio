@@ -48,26 +48,32 @@ export const startSessionPayment = async ({
       },
 
       handler: (response) => {
-        console.log(
-          "Razorpay frontend success:",
-          response
-        );
+  console.log(
+    "Razorpay frontend success:",
+    response
+  );
 
-        /*
-         * IMPORTANT:
-         * DO NOT mark the session paid here.
-         *
-         * Webhook verification will do that later.
-         */
+  /*
+   * IMPORTANT:
+   *
+   * This only means Razorpay Checkout completed.
+   *
+   * The backend webhook is responsible for:
+   *
+   * session_payments.status = captured
+   * print_sessions.status = paid
+   */
 
-        onSuccess?.(response);
-      },
+  onSuccess?.(response);
+},
 
-      modal: {
-        ondismiss: () => {
-          console.log("Razorpay checkout closed");
-        },
-      },
+modal: {
+  ondismiss: () => {
+    console.log(
+      "Razorpay checkout closed"
+    );
+  },
+},
     };
 
     const razorpay = new window.Razorpay(options);
