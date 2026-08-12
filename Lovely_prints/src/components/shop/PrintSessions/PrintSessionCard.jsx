@@ -1,9 +1,10 @@
+import './printSessionCard.css'
 const PrintSessionCard = ({
   session,
   onOpen,
 }) => {
   return (
-    <div className="print-session-card">
+    <div className="print-session-card-xz">
 
       <div>
         <h3>
@@ -17,11 +18,11 @@ const PrintSessionCard = ({
         </p>
       </div>
 
-      <div className="session-card-status">
+      <div className="session-card-status-xz">
         {session.status}
       </div>
 
-      <div className="session-card-time">
+      <div className="session-card-time-xz">
         {new Date(
           session.created_at
         ).toLocaleTimeString()}
