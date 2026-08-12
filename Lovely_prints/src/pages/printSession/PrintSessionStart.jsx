@@ -124,47 +124,6 @@ const PrintSessionStart = () => {
               payment — without waiting at the counter.
             </p>
 
-            <div className="start-benefits">
-              <div className="start-benefit">
-                <span>
-                  <Check size={14} />
-                </span>
-                Upload documents
-              </div>
-
-              <div className="start-benefit">
-                <span>
-                  <Check size={14} />
-                </span>
-                Get the shop's quotation
-              </div>
-
-              <div className="start-benefit">
-                <span>
-                  <Check size={14} />
-                </span>
-                Pay securely
-              </div>
-            </div>
-
-            <div className="start-app-card">
-              <div className="start-app-icon">
-                <Smartphone size={20} />
-              </div>
-
-              <div className="start-app-copy">
-                <strong>Take Docuvio with you</strong>
-                <p>
-                  The Docuvio Android app makes uploading
-                  and managing your prints even easier.
-                </p>
-              </div>
-
-              <div className="start-app-badge">
-                <Download size={13} />
-                Android
-              </div>
-            </div>
           </div>
 
           <section className="print-session-start-card">
@@ -182,10 +141,23 @@ const PrintSessionStart = () => {
                 </p>
               </div>
 
-              <div className="start-session-badge">
-                <span />
-                Ready
-              </div>
+              <button
+              className="print-session-start-button"
+              onClick={handleStartPrinting}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="start-button-spinner" />
+                  Starting Print Session...
+                </>
+              ) : (
+                <>
+                  Start Printing
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
             </div>
 
             <div className="start-workflow">
@@ -243,23 +215,7 @@ const PrintSessionStart = () => {
               </div>
             )}
 
-            <button
-              className="print-session-start-button"
-              onClick={handleStartPrinting}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="start-button-spinner" />
-                  Starting Print Session...
-                </>
-              ) : (
-                <>
-                  Start Printing
-                  <ArrowRight size={17} />
-                </>
-              )}
-            </button>
+           
 
             <p className="print-session-start-note">
               No account required to start this print session.

@@ -15,7 +15,7 @@ import "./printSession.css";
 import SessionQuotation from "../student/printSession/SessionQuotation";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
+const PRINT_SESSION_STORAGE_KEY = "docuvio_active_print_session";
 const ALLOWED_TYPES = [
   "application/pdf",
   "application/msword",
@@ -75,6 +75,55 @@ const PrintSessionPage = () => {
   const { sessionToken } = useParams();
   const navigate = useNavigate();
 
+  useEffect(() => {
+  if (sessionToken) {
+    localStorage.setItem(
+      PRINT_SESSION_STORAGE_KEY,
+      sessionToken
+    );
+  }
+}, [sessionToken]);
+
+
+useEffect(() => {
+  const handleOnline = async () => {
+    console.log(
+      "Docuvio network restored. Reconnecting session..."
+    );
+
+    setError("");
+
+    const restoredSession =
+      await loadSession({
+        silent: true,
+      });
+
+    if (
+      restoredSession &&
+      [
+        "files_uploading",
+        "files_uploaded",
+        "reviewing",
+      ].includes(restoredSession.status)
+    ) {
+      await loadFiles();
+    }
+  };
+
+  window.addEventListener(
+    "online",
+    handleOnline
+  );
+
+  return () => {
+    window.removeEventListener(
+      "online",
+      handleOnline
+    );
+  };
+}, [sessionToken]);
+
+
   const fileInputRef = useRef(null);
 
   const [session, setSession] = useState(null);
@@ -119,50 +168,78 @@ const PrintSessionPage = () => {
   // LOAD SESSION
   // ============================================================
 
-  const loadSession = async ({ silent = false } = {}) => {
-    try {
-      if (!silent) {
-        setLoading(true);
-        setError("");
-      }
+const loadSession = async ({ silent = false } = {}) => {
+  try {
+    if (!silent) {
+      setLoading(true);
+      setError("");
+    }
 
-      const response = await getPrintSession(sessionToken);
+    const response =
+      await getPrintSession(sessionToken);
 
-      if (!response?.success) {
-        throw new Error(
-          response?.message || "Unable to load print session"
-        );
-      }
+    if (!response?.success) {
+      throw new Error(
+        response?.message ||
+          "Unable to load print session"
+      );
+    }
 
-      setSession(response.data);
+    setSession(response.data);
 
-      if (response.data?.customer_name) {
-        setCustomerName(response.data.customer_name);
-      }
+    if (response.data?.customer_name) {
+      setCustomerName(
+        response.data.customer_name
+      );
+    }
 
-      if (response.data?.customer_phone) {
-        setCustomerPhone(response.data.customer_phone);
-      }
+    if (response.data?.customer_phone) {
+      setCustomerPhone(
+        response.data.customer_phone
+      );
+    }
 
-      return response.data;
-    } catch (err) {
-      console.error("Failed to load print session:", err);
+    return response.data;
 
-      if (!silent) {
-        setError(
-          err?.response?.data?.message ||
-            err?.message ||
-            "Unable to load this print session."
-        );
-      }
+  } catch (err) {
+    console.error(
+      "Failed to load print session:",
+      err
+    );
+
+    // ==========================================
+    // NETWORK FAILURE
+    // ==========================================
+
+    if (!err.response) {
+      setError(
+        "Connection lost. Your print session is safe. Reconnecting..."
+      );
 
       return null;
-    } finally {
-      if (!silent) {
-        setLoading(false);
-      }
     }
-  };
+
+    // ==========================================
+    // REAL BACKEND ERROR
+    // ==========================================
+
+    if (!silent) {
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Unable to load this print session."
+      );
+    }
+
+    return null;
+
+  } finally {
+    if (!silent) {
+      setLoading(false);
+    }
+  }
+};
+
 
   // ============================================================
   // LOAD FILES
@@ -262,19 +339,26 @@ const PrintSessionPage = () => {
     }
 
     const interval = setInterval(async () => {
-      const latestSession = await loadSession({
-        silent: true,
-      });
+  if (!navigator.onLine) {
+    return;
+  }
 
-      if (
-        latestSession &&
-        ["files_uploading", "files_uploaded", "reviewing"].includes(
-          latestSession.status
-        )
-      ) {
-        await loadFiles();
-      }
-    }, POLL_INTERVAL);
+  const latestSession =
+    await loadSession({
+      silent: true,
+    });
+
+  if (
+    latestSession &&
+    [
+      "files_uploading",
+      "files_uploaded",
+      "reviewing",
+    ].includes(latestSession.status)
+  ) {
+    await loadFiles();
+  }
+}, POLL_INTERVAL);
 
     return () => clearInterval(interval);
   }, [sessionToken, status]);
@@ -536,32 +620,43 @@ setSuccessMessage(
   // ============================================================
 
   if (!session) {
-    return (
-      <div className="print-session-page">
-        <div className="session-card session-error-card docuvio-card">
-          <div className="session-error-icon">
-            !
-          </div>
-
-          <h2>
-            Unable to open session
-          </h2>
-
-          <p>
-            {error ||
-              "Print session could not be loaded."}
-          </p>
-
-          <button
-            className="session-primary-btn docuvio-btn-primary"
-            onClick={() => navigate("/student")}
-          >
-            Back to Dashboard
-          </button>
+  return (
+    <div className="print-session-page">
+      <div className="session-card session-error-card docuvio-card">
+        <div className="session-error-icon">
+          !
         </div>
+
+        <h2>
+          {navigator.onLine
+            ? "Unable to open session"
+            : "Connection lost"}
+        </h2>
+
+        <p>
+          {navigator.onLine
+            ? (
+                error ||
+                "Print session could not be loaded."
+              )
+            : (
+                "Your print session has not been lost. "
+                + "We're waiting for the connection to return."
+              )}
+        </p>
+
+        <button
+          className="session-primary-btn docuvio-btn-primary"
+          onClick={() =>
+            loadSession()
+          }
+        >
+          Try Again
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <>
