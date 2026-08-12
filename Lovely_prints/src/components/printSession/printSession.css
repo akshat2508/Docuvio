@@ -1,292 +1,790 @@
+/* ==========================================================
+   DOCUVIO PRINT SESSION
+   Theme aligned with the current Docuvio student dashboard.
+========================================================== */
+
+:root {
+  --docuvio-bg: #f5f4e9;
+  --docuvio-surface: #fffefa;
+  --docuvio-surface-soft: #faf9f2;
+  --docuvio-border: #deddd3;
+  --docuvio-border-strong: #cbc9bd;
+  --docuvio-text: #292725;
+  --docuvio-muted: #77736d;
+  --docuvio-primary: #c8d63e;
+  --docuvio-primary-dark: #aab923;
+  --docuvio-yellow: #ffeaa6;
+  --docuvio-yellow-soft: #fff6cf;
+  --docuvio-coral: #ea7070;
+  --docuvio-coral-soft: #fff0ef;
+  --docuvio-green-soft: #edf6d6;
+  --docuvio-shadow: 0 10px 28px rgba(55, 53, 42, 0.06);
+  --docuvio-radius-xl: 28px;
+  --docuvio-radius-lg: 22px;
+  --docuvio-radius-md: 16px;
+}
+
+/* ==========================================================
+   PAGE
+========================================================== */
+
 .print-session-page {
   min-height: 100vh;
-  padding: 40px 20px;
-  background: #f6f7f9;
+  box-sizing: border-box;
+  padding: 30px 28px 54px;
+  background: var(--docuvio-bg);
+  color: var(--docuvio-text);
 }
 
 .print-session-container {
-  width: min(900px, 100%);
+  width: min(1320px, 100%);
   margin: 0 auto;
 }
+
+/* ==========================================================
+   PRINT SESSION WORKFLOW / 4-STEP TIMELINE
+========================================================== */
+
+.session-workflow {
+  margin-bottom: 22px;
+  padding: 20px 22px;
+  background: var(--docuvio-surface);
+  border: 1px solid var(--docuvio-border);
+  border-radius: var(--docuvio-radius-lg);
+  box-shadow: var(--docuvio-shadow);
+}
+
+.session-workflow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.session-workflow-header strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--docuvio-text);
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.session-workflow-eyebrow {
+  display: block;
+  color: var(--docuvio-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.3px;
+}
+
+.session-workflow-count {
+  padding: 7px 11px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 999px;
+  background: var(--docuvio-surface-soft);
+  color: var(--docuvio-muted);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.session-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 3px 2px 1px;
+}
+
+.session-timeline-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.session-timeline-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+}
+
+.session-timeline-marker > span {
+  position: relative;
+  z-index: 2;
+  width: 31px;
+  height: 31px;
+  min-width: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #dfddd4;
+  border-radius: 50%;
+  background: #f3f2eb;
+  color: #98948b;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.session-timeline-step.active .session-timeline-marker > span {
+  border-color: var(--docuvio-primary);
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  box-shadow: 0 0 0 5px rgba(200, 214, 62, 0.15);
+}
+
+.session-timeline-step.complete .session-timeline-marker > span {
+  border-color: #d6e2a7;
+  background: var(--docuvio-green-soft);
+  color: #65751d;
+}
+
+.session-timeline-line {
+  position: absolute;
+  left: 31px;
+  right: 0;
+  top: 14px;
+  height: 2px;
+  background: #e5e3da;
+}
+
+.session-timeline-line.complete {
+  background: #cad77d;
+}
+
+.session-timeline-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px 0 0;
+}
+
+.session-timeline-label {
+  color: #99958c;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.session-timeline-step.active .session-timeline-label {
+  color: var(--docuvio-text);
+  font-weight: 900;
+}
+
+.session-timeline-step.complete .session-timeline-label {
+  color: #68732a;
+}
+
+.session-timeline-current,
+.session-timeline-complete,
+.session-timeline-upcoming {
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.65px;
+}
+
+.session-timeline-current {
+  color: #7b851f;
+}
+
+.session-timeline-complete {
+  color: #8c9270;
+}
+
+.session-timeline-upcoming {
+  color: #aaa69d;
+}
+
+.session-workflow-summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 13px;
+  margin-top: 17px;
+  padding: 13px 15px;
+  border: 1px solid #dfe4b8;
+  border-radius: 16px;
+  background: var(--docuvio-yellow-soft);
+}
+
+.session-workflow-summary-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.session-workflow-summary-copy {
+  min-width: 0;
+}
+
+.session-workflow-summary-copy > span,
+.session-workflow-next > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #817a5e;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.session-workflow-summary-copy strong,
+.session-workflow-next strong {
+  display: block;
+  color: var(--docuvio-text);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.session-workflow-summary-copy p {
+  margin: 2px 0 0;
+  color: #8a8265;
+  font-size: 10px;
+}
+
+.session-workflow-next {
+  padding-left: 18px;
+  border-left: 1px solid #e3dfbd;
+  text-align: right;
+}
+
+/* ==========================================================
+   DESKTOP CONTENT GRID
+========================================================== */
+
+.session-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: start;
+}
+
+.session-main-content {
+  min-width: 0;
+}
+
+.session-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 20px;
+}
+
+.session-side-card {
+  padding: 18px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 20px;
+  background: var(--docuvio-surface);
+  box-shadow: var(--docuvio-shadow);
+}
+
+.session-side-current {
+  border-color: #dfe4b8;
+  background: var(--docuvio-yellow-soft);
+}
+
+.session-side-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--docuvio-muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.session-side-number {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.session-side-card h3 {
+  margin: 0 0 5px;
+  color: var(--docuvio-text);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.session-side-card p {
+  margin: 0;
+  color: var(--docuvio-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.session-side-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 9px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.65);
+  color: var(--docuvio-muted);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.session-side-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--docuvio-primary-dark);
+}
+
+/* ==========================================================
+   STARTING SESSION STATE
+========================================================== */
+
+.session-start-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #dfe4b8;
+  border-radius: 18px;
+  background: var(--docuvio-yellow-soft);
+}
+
+.session-start-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+}
+
+.session-start-icon span {
+  font-size: 16px;
+  animation: session-start-pulse 1.3s infinite;
+}
+
+.session-start-copy > span {
+  display: block;
+  margin-bottom: 4px;
+  color: #7c765f;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.session-start-copy h3 {
+  margin: 0 0 4px;
+  color: var(--docuvio-text);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.session-start-copy p {
+  margin: 0;
+  color: #827b64;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.session-start-progress {
+  height: 5px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7e2bd;
+}
+
+.session-start-progress i {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--docuvio-primary-dark);
+  animation: session-start-progress 1.4s ease-in-out infinite;
+}
+
+.session-start-status {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+@keyframes session-start-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes session-start-progress {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(280%); }
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
 
 .session-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 24px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
+  padding: 4px 4px 0;
+}
+
+.session-header-copy {
+  min-width: 0;
 }
 
 .session-eyebrow {
   display: inline-block;
-  margin-bottom: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  color: #777;
+  margin-bottom: 7px;
+  color: var(--docuvio-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
 }
 
 .session-header h1 {
   margin: 0;
-  font-size: 32px;
-  line-height: 1.2;
-  color: #171717;
+  color: var(--docuvio-text);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -1.2px;
+  font-weight: 850;
 }
 
 .session-header p {
-  margin: 8px 0 0;
-  color: #6b7280;
+  max-width: 650px;
+  margin: 9px 0 0;
+  color: var(--docuvio-muted);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .session-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--docuvio-border);
   border-radius: 999px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--docuvio-surface);
+  box-shadow: 0 4px 12px rgba(55, 53, 42, 0.04);
+  color: var(--docuvio-text);
   white-space: nowrap;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--docuvio-primary);
+  box-shadow: 0 0 0 4px rgba(200, 214, 62, 0.16);
 }
 
+.status-dot-success {
+  background: #7c9b25;
+}
+
+/* ==========================================================
+   CARDS / SECTIONS
+========================================================== */
+
 .session-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
+  padding: 26px;
+  background: var(--docuvio-surface);
+  border: 1px solid var(--docuvio-border);
+  border-radius: var(--docuvio-radius-xl);
+  box-shadow: var(--docuvio-shadow);
 }
 
 .section-heading {
   display: flex;
-  gap: 14px;
   align-items: flex-start;
-  margin-bottom: 24px;
+  gap: 13px;
+  margin-bottom: 22px;
 }
 
 .section-number {
   width: 34px;
   height: 34px;
   min-width: 34px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #111827;
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
+  border-radius: 12px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  font-size: 13px;
+  font-weight: 850;
 }
 
 .section-heading h2 {
-  margin: 2px 0 5px;
+  margin: 1px 0 5px;
+  color: var(--docuvio-text);
   font-size: 20px;
-  color: #171717;
+  font-weight: 850;
+  letter-spacing: -0.3px;
 }
 
 .section-heading p {
   margin: 0;
-  color: #6b7280;
-  font-size: 14px;
+  color: var(--docuvio-muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
+
+/* ==========================================================
+   FORMS
+========================================================== */
 
 .session-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 22px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .session-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .session-field label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
+  color: #45423d;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .session-field input {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 14px;
+  padding: 13px 14px;
+  border: 1px solid var(--docuvio-border-strong);
+  border-radius: 13px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+  color: var(--docuvio-text);
+  font-size: 14px;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+.session-field input::placeholder {
+  color: #aaa79f;
 }
 
 .session-field input:focus {
-  border-color: #111827;
-  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+  border-color: #b9c82d;
+  box-shadow: 0 0 0 4px rgba(200, 214, 62, 0.17);
 }
 
 .session-field input:disabled {
-  background: #f3f4f6;
+  background: #f1f0e9;
   cursor: not-allowed;
 }
 
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
 .session-primary-btn {
-  border: 0;
-  border-radius: 10px;
+  border: 1px solid transparent;
+  border-radius: 13px;
   padding: 12px 20px;
-  background: #111827;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
+  font-size: 13px;
+  font-weight: 850;
   cursor: pointer;
+  box-shadow: 0 6px 14px rgba(174, 188, 38, 0.18);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .session-primary-btn:hover {
-  background: #1f2937;
+  background: var(--docuvio-primary-dark);
+  box-shadow: 0 8px 17px rgba(174, 188, 38, 0.22);
+  transform: translateY(-1px);
 }
 
 .session-primary-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.48;
+  box-shadow: none;
   cursor: not-allowed;
+  transform: none;
 }
 
-.completed-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 9px;
-  background: #ecfdf5;
-  color: #047857;
-  font-size: 14px;
-  font-weight: 600;
+.docuvio-btn-secondary {
+  border-color: var(--docuvio-border-strong);
+  background: #fff;
+  color: var(--docuvio-text);
 }
 
-.completed-step span {
-  font-size: 16px;
+.docuvio-btn-secondary:hover {
+  background: var(--docuvio-yellow-soft);
 }
+
+/* ==========================================================
+   UPLOAD
+========================================================== */
 
 .upload-start-state {
-  padding: 22px;
-  border-radius: 12px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  padding: 20px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: var(--docuvio-radius-md);
+  background: var(--docuvio-surface-soft);
 }
 
 .upload-start-state p {
-  margin: 0 0 16px;
-  color: #6b7280;
+  margin: 0 0 15px;
+  color: var(--docuvio-muted);
 }
 
 .session-upload-box {
-  border: 2px dashed #d1d5db;
-  border-radius: 14px;
-  padding: 36px 20px;
+  padding: 34px 20px;
+  border: 2px dashed #c8c6ba;
+  border-radius: var(--docuvio-radius-lg);
+  background: #fcfbf4;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s;
 }
 
 .session-upload-box:hover {
-  border-color: #9ca3af;
-  background: #fafafa;
+  border-color: #b7c52c;
+  background: var(--docuvio-yellow-soft);
+  transform: translateY(-1px);
 }
 
 .session-upload-box.uploading {
-  opacity: 0.6;
+  opacity: 0.62;
   cursor: wait;
+  transform: none;
 }
 
 .upload-icon {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   margin: 0 auto 12px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  color: #111827;
+  border-radius: 14px;
+  background: var(--docuvio-primary);
+  color: var(--docuvio-text);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .session-upload-box h3 {
   margin: 0 0 6px;
+  color: var(--docuvio-text);
   font-size: 16px;
+  font-weight: 850;
 }
 
 .session-upload-box p {
   margin: 0 0 4px;
-  color: #4b5563;
-  font-size: 14px;
+  color: #5f5b54;
+  font-size: 13px;
 }
 
 .session-upload-box span {
-  color: #9ca3af;
-  font-size: 12px;
+  color: #99958c;
+  font-size: 11px;
 }
 
+/* ==========================================================
+   FILES
+========================================================== */
+
 .session-files-section {
-  margin-top: 26px;
+  margin-top: 24px;
 }
 
 .files-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 11px;
 }
 
 .files-header h3 {
   margin: 0;
-  font-size: 16px;
+  color: var(--docuvio-text);
+  font-size: 15px;
+  font-weight: 850;
 }
 
 .files-header span {
-  font-size: 13px;
-  color: #6b7280;
+  color: var(--docuvio-muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .empty-files {
-  padding: 25px;
-  border-radius: 10px;
-  background: #f9fafb;
+  padding: 24px;
+  border: 1px dashed var(--docuvio-border-strong);
+  border-radius: 14px;
+  background: var(--docuvio-surface-soft);
+  color: var(--docuvio-muted);
   text-align: center;
-  color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .session-file-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
 .session-file-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding: 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 11px;
+  padding: 12px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 15px;
+  background: #fff;
+  transition: border-color 0.16s, box-shadow 0.16s;
+}
+
+.session-file-item:hover {
+  border-color: #c9c4a8;
+  box-shadow: 0 5px 15px rgba(55, 53, 42, 0.04);
 }
 
 .file-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   min-width: 0;
 }
 
@@ -294,54 +792,302 @@
   width: 40px;
   height: 40px;
   min-width: 40px;
-  border-radius: 8px;
-  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  color: #374151;
+  border-radius: 11px;
+  background: var(--docuvio-yellow);
+  color: #5f5430;
+  font-size: 9px;
+  font-weight: 900;
 }
 
 .file-info div:last-child {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 }
 
 .file-info strong {
-  max-width: 500px;
+  max-width: 620px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  color: var(--docuvio-text);
+  font-size: 13px;
 }
 
 .file-info span {
-  font-size: 12px;
-  color: #6b7280;
+  color: var(--docuvio-muted);
+  font-size: 11px;
 }
 
-.file-preview-btn {
-  border: 1px solid #d1d5db;
-  background: white;
-  border-radius: 8px;
-  padding: 8px 13px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+/* ==========================================================
+   STATE CARDS
+========================================================== */
+
+.session-state-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-.file-preview-btn:hover {
-  background: #f9fafb;
+.session-state-card > div:nth-child(2) {
+  flex: 1;
 }
+
+.state-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: var(--docuvio-yellow);
+  color: var(--docuvio-text);
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.state-icon-success {
+  background: var(--docuvio-green-soft);
+  color: #65751d;
+}
+
+.state-icon-error {
+  background: var(--docuvio-coral-soft);
+  color: #bd5353;
+}
+
+.state-icon-review {
+  background: var(--docuvio-yellow-soft);
+  color: #7a682b;
+}
+
+.state-icon-payment {
+  background: var(--docuvio-yellow);
+  color: #66582b;
+}
+
+.state-icon-print {
+  background: #efeee7;
+  color: var(--docuvio-text);
+}
+
+.state-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--docuvio-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.1px;
+}
+
+.session-state-card h2 {
+  margin: 0 0 5px;
+  color: var(--docuvio-text);
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.2px;
+}
+
+.session-state-card p {
+  margin: 0;
+  color: var(--docuvio-muted);
+  line-height: 1.55;
+  font-size: 13px;
+}
+
+.session-state-card small {
+  display: block;
+  margin-top: 7px;
+  color: #aaa69d;
+  font-size: 11px;
+}
+
+/* ==========================================================
+   WAITING / ACTIVITY
+========================================================== */
+
+.state-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 999px;
+  background: var(--docuvio-surface-soft);
+  color: var(--docuvio-muted);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.state-pulse span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--docuvio-primary-dark);
+  animation: session-pulse 1.5s infinite;
+}
+
+@keyframes session-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.session-waiting-inline {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 15px;
+  background: var(--docuvio-surface-soft);
+}
+
+.session-waiting-inline strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--docuvio-text);
+  font-size: 13px;
+}
+
+.session-waiting-inline p {
+  margin: 0;
+  color: var(--docuvio-muted);
+  font-size: 12px;
+}
+
+/* ==========================================================
+   SPINNER
+========================================================== */
+
+.session-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e0d7;
+  border-top-color: var(--docuvio-primary-dark);
+  border-radius: 50%;
+  animation: session-spin 0.8s linear infinite;
+}
+
+.session-spinner.small {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-width: 2px;
+}
+
+@keyframes session-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   ALERTS
+========================================================== */
+
+.session-alert {
+  padding: 12px 15px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.session-alert-error {
+  background: var(--docuvio-coral-soft);
+  color: #a94b4b;
+  border: 1px solid #f2c7c4;
+}
+
+.session-alert-success {
+  background: var(--docuvio-green-soft);
+  color: #61701e;
+  border: 1px solid #d4e2a6;
+}
+
+/* ==========================================================
+   QUOTATION / PAYMENT
+========================================================== */
+
+.session-quotation-card {
+  border-color: #dedcae;
+}
+
+.quotation-header h2 {
+  margin: 0 0 6px;
+  color: var(--docuvio-text);
+  font-size: 22px;
+  font-weight: 850;
+}
+
+.quotation-header p {
+  margin: 0;
+  color: var(--docuvio-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.quotation-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 22px 0;
+  padding: 19px;
+  border: 1px solid #e5dfb9;
+  border-radius: 17px;
+  background: var(--docuvio-yellow-soft);
+}
+
+.quotation-amount span {
+  color: #746c50;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.quotation-amount strong {
+  color: var(--docuvio-text);
+  font-size: 29px;
+  letter-spacing: -0.7px;
+}
+
+.quotation-pay-btn {
+  width: 100%;
+  min-height: 46px;
+}
+
+.quotation-note {
+  margin: 9px 0 0;
+  color: #aaa38e;
+  text-align: center;
+  font-size: 11px;
+}
+
+.payment-state-card {
+  border-color: #e6d59d;
+}
+
+/* ==========================================================
+   NEXT STEP
+========================================================== */
 
 .next-step-card {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 22px;
 }
 
 .next-step-card > div {
@@ -350,85 +1096,68 @@
 
 .next-step-card h2 {
   margin: 5px 0;
+  color: var(--docuvio-text);
   font-size: 18px;
+  font-weight: 850;
 }
 
 .next-step-card p {
   margin: 0;
-  color: #6b7280;
+  color: var(--docuvio-muted);
   font-size: 13px;
 }
 
 .next-step-card small {
   display: block;
-  color: #9ca3af;
+  color: #aaa69d;
 }
 
 .next-step-label {
-  font-size: 11px;
-  font-weight: 700;
+  color: var(--docuvio-muted);
+  font-size: 10px;
+  font-weight: 850;
   letter-spacing: 1px;
-  color: #6b7280;
 }
 
-.session-alert {
-  padding: 12px 15px;
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.session-alert-error {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-.session-alert-success {
-  background: #ecfdf5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
-}
+/* ==========================================================
+   EXPIRED / ERROR / LOADING
+========================================================== */
 
 .session-expired {
+  padding: 48px 28px;
   text-align: center;
-  padding: 50px 28px;
+}
+
+.session-expired .state-icon {
+  margin: 0 auto 14px;
 }
 
 .session-expired h2 {
-  margin: 0 0 10px;
+  margin: 0 0 9px;
+  color: var(--docuvio-text);
 }
 
 .session-expired p {
   max-width: 500px;
   margin: 0 auto;
-  color: #6b7280;
+  color: var(--docuvio-muted);
   line-height: 1.6;
+  font-size: 13px;
 }
 
 .session-loading {
   min-height: 250px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
   gap: 12px;
-  color: #6b7280;
+  color: var(--docuvio-muted);
 }
 
-.session-spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #111827;
-  border-radius: 50%;
-  animation: session-spin 0.8s linear infinite;
-}
-
-@keyframes session-spin {
-  to {
-    transform: rotate(360deg);
-  }
+.session-loading p {
+  margin: 0;
+  font-size: 13px;
 }
 
 .session-error-card {
@@ -438,55 +1167,64 @@
 }
 
 .session-error-icon {
-  width: 45px;
-  height: 45px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  background: #fef2f2;
-  color: #b91c1c;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  border-radius: 15px;
+  background: var(--docuvio-coral-soft);
+  color: #bd5353;
+  font-weight: 900;
 }
 
 .session-error-card h2 {
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+  color: var(--docuvio-text);
 }
 
 .session-error-card p {
-  color: #6b7280;
-  margin-bottom: 22px;
+  margin: 0 0 20px;
+  color: var(--docuvio-muted);
 }
+
+/* ==========================================================
+   PREVIEW MODAL
+========================================================== */
 
 .session-preview-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background: rgba(38, 36, 30, 0.62);
+  backdrop-filter: blur(3px);
 }
 
 .session-preview-modal {
   width: min(1000px, 100%);
   height: min(90vh, 800px);
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 24px;
+  background: var(--docuvio-surface);
+  box-shadow: 0 25px 70px rgba(30, 28, 20, 0.2);
 }
 
 .preview-header {
-  min-height: 55px;
+  min-height: 58px;
   padding: 0 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 14px;
+  border-bottom: 1px solid var(--docuvio-border);
 }
 
 .preview-header strong {
@@ -494,23 +1232,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--docuvio-text);
+  font-size: 13px;
 }
 
 .preview-close {
-  border: 0;
-  background: transparent;
-  font-size: 28px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--docuvio-border);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--docuvio-text);
+  font-size: 23px;
+  line-height: 1;
   cursor: pointer;
-  color: #374151;
+}
+
+.preview-close:hover {
+  background: var(--docuvio-yellow-soft);
 }
 
 .preview-content {
   flex: 1;
   overflow: auto;
-  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #ecebe4;
 }
 
 .preview-content img {
@@ -526,298 +1274,337 @@
 }
 
 .unsupported-preview {
-  text-align: center;
   padding: 30px;
+  text-align: center;
 }
 
 .unsupported-preview h3 {
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+  color: var(--docuvio-text);
 }
 
 .unsupported-preview p {
-  color: #6b7280;
-  margin-bottom: 20px;
-}
-
-@media (max-width: 700px) {
-  .print-session-page {
-    padding: 20px 12px;
-  }
-
-  .session-header {
-    flex-direction: column;
-  }
-
-  .session-header h1 {
-    font-size: 26px;
-  }
-
-  .session-card {
-    padding: 20px;
-  }
-
-  .session-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .session-file-item {
-    align-items: flex-start;
-  }
-
-  .next-step-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .session-preview-modal {
-    height: 85vh;
-  }
-}
-
-
-/* ==========================================================
-   PRINT SESSION STATE CARDS
-========================================================== */
-
-.session-state-card {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.session-state-card > div:nth-child(2) {
-  flex: 1;
-}
-
-.state-icon {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.state-icon-success {
-  background: #ecfdf5;
-  color: #047857;
-}
-
-.state-icon-error {
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-.state-icon-review {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.state-icon-payment {
-  background: #fff7ed;
-  color: #c2410c;
-}
-
-.state-icon-print {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-.state-eyebrow {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.1px;
-  color: #6b7280;
-}
-
-.session-state-card h2 {
-  margin: 0 0 6px;
-  font-size: 19px;
-  color: #171717;
-}
-
-.session-state-card p {
-  margin: 0;
-  color: #6b7280;
-  line-height: 1.55;
-  font-size: 14px;
-}
-
-.session-state-card small {
-  display: block;
-  margin-top: 8px;
-  color: #9ca3af;
-}
-
-/* ==========================================================
-   WAITING / ACTIVITY INDICATOR
-========================================================== */
-
-.state-pulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.state-pulse span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  animation: session-pulse 1.5s infinite;
-}
-
-@keyframes session-pulse {
-  0% {
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
-}
-
-/* ==========================================================
-   INLINE CONNECTION STATE
-========================================================== */
-
-.session-waiting-inline {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-}
-
-.session-waiting-inline strong {
-  display: block;
-  margin-bottom: 3px;
-  font-size: 14px;
-}
-
-.session-waiting-inline p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.session-spinner.small {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  border-width: 2px;
-}
-
-/* ==========================================================
-   QUOTATION
-========================================================== */
-
-.session-quotation-card {
-  border-color: #dbeafe;
-}
-
-.quotation-header h2 {
-  margin: 0 0 7px;
-  font-size: 22px;
-  color: #171717;
-}
-
-.quotation-header p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.quotation-amount {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin: 24px 0;
-  padding: 20px;
-  border-radius: 14px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-}
-
-.quotation-amount span {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.quotation-amount strong {
-  color: #111827;
-  font-size: 30px;
-  letter-spacing: -0.5px;
-}
-
-.quotation-pay-btn {
-  width: 100%;
-  min-height: 46px;
-}
-
-.quotation-note {
-  margin: 10px 0 0;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-/* ==========================================================
-   PAYMENT
-========================================================== */
-
-.payment-state-card {
-  border-color: #fed7aa;
-}
-
-.status-dot-success {
-  background: #16a34a;
+  margin: 0 0 20px;
+  color: var(--docuvio-muted);
 }
 
 /* ==========================================================
    MOBILE
 ========================================================== */
 
-@media (max-width: 700px) {
-  .session-state-card {
-    align-items: flex-start;
+@media (max-width: 1050px) {
+  .session-content-grid {
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 16px;
   }
 
-  .state-pulse {
+  .session-workflow-summary {
+    grid-template-columns: auto 1fr;
+  }
+
+  .session-workflow-next {
+    grid-column: 2;
+    padding-left: 0;
+    padding-top: 8px;
+    border-left: 0;
+    border-top: 1px solid #e3dfbd;
+    text-align: left;
+  }
+}
+
+@media (max-width: 860px) {
+  .print-session-page {
+    padding: 20px 16px 40px;
+  }
+
+  .session-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .session-side-panel {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .session-side-card {
+    min-width: 0;
+  }
+
+  .session-timeline {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .print-session-page {
+    padding: 14px 10px 30px;
+  }
+
+  .print-session-container {
+    width: 100%;
+  }
+
+  .session-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 18px;
+  }
+
+  .session-header h1 {
+    font-size: 28px;
+  }
+
+  .session-status {
     align-self: flex-start;
   }
 
-  .quotation-amount {
+  .session-workflow {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .session-workflow-count {
+    align-self: flex-start;
+  }
+
+  .session-workflow-header {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
   }
 
+  .session-timeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    padding: 2px 0 0;
+  }
+
+  .session-timeline-step {
+    display: block;
+    min-width: 0;
+  }
+
+  .session-timeline-marker {
+    min-height: 32px;
+    align-items: center;
+  }
+
+  .session-timeline-marker > span {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+
+  .session-timeline-line {
+    left: 28px;
+    right: 0;
+    top: 13px;
+    width: auto;
+    height: 2px;
+  }
+
+  .session-timeline-copy {
+    gap: 3px;
+    padding: 7px 5px 0 0;
+  }
+
+  .session-timeline-label {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .session-timeline-current,
+  .session-timeline-complete,
+  .session-timeline-upcoming {
+    font-size: 7px;
+    line-height: 1.2;
+  }
+
+  .session-workflow-summary {
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+
+  .session-workflow-next {
+    grid-column: 2;
+    padding-top: 9px;
+  }
+
+  .session-content-grid {
+    display: block;
+  }
+
+  .session-side-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 4px;
+  }
+
+  .session-card {
+    padding: 20px;
+    border-radius: 21px;
+  }
+
+  .session-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .session-start-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .session-start-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .session-state-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .state-pulse {
+    margin-left: 66px;
+  }
+
+  .session-file-item {
+    align-items: flex-start;
+  }
+
+  .file-info strong {
+    max-width: 190px;
+  }
+
+  .next-step-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .quotation-amount {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
   .quotation-amount strong {
     font-size: 27px;
+  }
+
+  .session-preview-overlay {
+    padding: 10px;
+  }
+
+  .session-preview-modal {
+    height: 88vh;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .session-workflow {
+    padding: 13px;
+  }
+
+  .session-workflow-header {
+    margin-bottom: 15px;
+  }
+
+  .session-timeline-marker > span {
+    width: 25px;
+    height: 25px;
+    min-width: 25px;
+    font-size: 9px;
+  }
+
+  .session-timeline-line {
+    left: 25px;
+    top: 12px;
+  }
+
+  .session-timeline-copy {
+    padding-right: 3px;
+  }
+
+  .session-timeline-label {
+    font-size: 9px;
+  }
+
+  .session-timeline-current,
+  .session-timeline-complete,
+  .session-timeline-upcoming {
+    font-size: 6px;
+  }
+
+  .session-workflow-summary {
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  .session-card {
+    padding: 17px;
+  }
+
+  .session-header h1 {
+    font-size: 25px;
+  }
+
+  .session-start-card {
+    grid-template-columns: 1fr;
+  }
+
+  .session-start-status {
+    grid-column: 1;
+  }
+
+  .state-pulse {
+    margin-left: 0;
+  }
+
+  .session-file-item {
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .file-preview-btn {
+    width: 100%;
+  }
+
+  .file-info {
+    width: 100%;
+  }
+}
+
+
+/* ==========================================================
+   MOBILE WORKFLOW POLISH
+========================================================== */
+
+@media (max-width: 680px) {
+  .session-timeline-step {
+    overflow: visible;
+  }
+
+  .session-timeline-copy {
+    min-width: 0;
+  }
+
+  .session-timeline-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .session-workflow-summary-copy strong,
+  .session-workflow-next strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

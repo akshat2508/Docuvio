@@ -42,6 +42,25 @@ const STATUS_LABELS = {
   expired: "Session Expired",
 };
 
+const SESSION_STEPS = [
+  { key: "details", label: "Your Details" },
+  { key: "upload", label: "Upload Files" },
+  { key: "review", label: "Review & Quote" },
+  { key: "payment", label: "Payment" },
+];
+
+const getSessionStepIndex = (currentStatus) => {
+  if (["created", "connected", "customer_details"].includes(currentStatus)) return 0;
+  if (["files_uploading", "files_uploaded"].includes(currentStatus)) return 1;
+  if (["reviewing", "quote_ready"].includes(currentStatus)) return 2;
+  if (
+    ["payment_pending", "paid", "printing", "ready_for_pickup", "completed"].includes(
+      currentStatus
+    )
+  ) return 3;
+  return 0;
+};
+
 const POLLING_STATUSES = [
   "files_uploaded",
   "reviewing",
@@ -83,6 +102,8 @@ const PrintSessionPage = () => {
     () => STATUS_LABELS[status] || status || "Loading",
     [status]
   );
+
+  const currentStepIndex = getSessionStepIndex(status);
 
   const canSubmitCustomer =
     customerName.trim().length >= 2 &&
@@ -499,7 +520,7 @@ setSuccessMessage(
 
   if (loading) {
     return (
-      <div className="print-session-page">
+      <div className="print-session-page docuvio-session-theme">
         <div className="print-session-container">
           <div className="session-card session-loading">
             <div className="session-spinner" />
@@ -517,7 +538,7 @@ setSuccessMessage(
   if (!session) {
     return (
       <div className="print-session-page">
-        <div className="session-card session-error-card">
+        <div className="session-card session-error-card docuvio-card">
           <div className="session-error-icon">
             !
           </div>
@@ -532,7 +553,7 @@ setSuccessMessage(
           </p>
 
           <button
-            className="session-primary-btn"
+            className="session-primary-btn docuvio-btn-primary"
             onClick={() => navigate("/student")}
           >
             Back to Dashboard
@@ -548,25 +569,131 @@ setSuccessMessage(
         <div className="print-session-container">
 
           {/* ==================================================
+              DOCUVIO SESSION JOURNEY
+          ================================================== */}
+
+          {!isExpired && (
+            <section
+              className="session-workflow"
+              aria-label="Print session progress"
+            >
+              <div className="session-workflow-header">
+                <div>
+                  <span className="session-workflow-eyebrow">
+                    PRINT SESSION
+                  </span>
+
+                  <strong>
+                    {session.shop?.shop_name ||
+                      session.shop_name ||
+                      "Print Shop"}
+                  </strong>
+                </div>
+
+                <span className="session-workflow-count">
+                  Step {currentStepIndex + 1} of {SESSION_STEPS.length}
+                </span>
+              </div>
+
+              <div className="session-timeline">
+                {SESSION_STEPS.map((step, index) => {
+                  const isActive = index === currentStepIndex;
+                  const isComplete = index < currentStepIndex;
+                  const isLast = index === SESSION_STEPS.length - 1;
+
+                  return (
+                    <div
+                      className={`session-timeline-step ${
+                        isActive ? "active" : ""
+                      } ${isComplete ? "complete" : ""}`}
+                      key={step.key}
+                    >
+                      <div className="session-timeline-marker">
+                        <span>
+                          {isComplete ? "✓" : index + 1}
+                        </span>
+
+                        {!isLast && (
+                          <i
+                            className={
+                              isComplete
+                                ? "session-timeline-line complete"
+                                : "session-timeline-line"
+                            }
+                          />
+                        )}
+                      </div>
+
+                      <div className="session-timeline-copy">
+                        <span className="session-timeline-label">
+                          {step.label}
+                        </span>
+
+                        {isActive && (
+                          <span className="session-timeline-current">
+                            YOU ARE HERE
+                          </span>
+                        )}
+
+                        {isComplete && (
+                          <span className="session-timeline-complete">
+                            Completed
+                          </span>
+                        )}
+
+                        {index > currentStepIndex && (
+                          <span className="session-timeline-upcoming">
+                            Up next
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="session-workflow-summary">
+                <div className="session-workflow-summary-icon">
+                  {currentStepIndex + 1}
+                </div>
+
+                <div className="session-workflow-summary-copy">
+                  <span>CURRENT STEP</span>
+                  <strong>
+                    {SESSION_STEPS[currentStepIndex]?.label}
+                  </strong>
+                  <p>{statusLabel}</p>
+                </div>
+
+                <div className="session-workflow-next">
+                  <span>NEXT</span>
+                  <strong>
+                    {currentStepIndex < SESSION_STEPS.length - 1
+                      ? SESSION_STEPS[currentStepIndex + 1].label
+                      : "Session completion"}
+                  </strong>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* ==================================================
               HEADER
           ================================================== */}
 
           <header className="session-header">
-            <div>
+            <div className="session-header-copy">
               <span className="session-eyebrow">
-                DOCUVIO PRINT SESSION
+                PRINT REQUEST
               </span>
 
               <h1>
-                {session.shop?.shop_name ||
-                  session.shop_name ||
-                  "Print Shop"}
+                Complete your print request
               </h1>
 
               <p>
-                Upload your files. The shop will
-                review them and send you the final
-                quotation.
+                Follow the four steps below. We'll keep
+                you updated as your request moves forward.
               </p>
             </div>
 
@@ -598,6 +725,9 @@ setSuccessMessage(
               {successMessage}
             </div>
           )}
+
+          <div className="session-content-grid">
+            <main className="session-main-content">
 
           {/* ==================================================
               EXPIRED
@@ -650,17 +780,32 @@ setSuccessMessage(
                 </div>
 
                 {status === "created" && (
-                  <div className="session-waiting-inline">
-                    <div className="session-spinner small" />
+                  <div className="session-start-card">
+                    <div className="session-start-icon">
+                      <span>●</span>
+                    </div>
 
-                    <div>
-                      <strong>
-                        Connecting to the shop...
-                      </strong>
+                    <div className="session-start-copy">
+                      <span>STARTING YOUR SESSION</span>
+
+                      <h3>
+                        Connecting you to {session.shop?.shop_name ||
+                          session.shop_name ||
+                          "the print shop"}
+                      </h3>
 
                       <p>
-                        Please wait a moment.
+                        Docuvio is securely opening your print session.
+                        This usually takes just a moment.
                       </p>
+
+                      <div className="session-start-progress">
+                        <i />
+                      </div>
+                    </div>
+
+                    <div className="session-start-status">
+                      Connecting
                     </div>
                   </div>
                 )}
@@ -723,7 +868,7 @@ setSuccessMessage(
 
                     <button
                       type="submit"
-                      className="session-primary-btn"
+                      className="session-primary-btn docuvio-btn-primary"
                       disabled={!canSubmitCustomer}
                     >
                       {submittingCustomer
@@ -857,7 +1002,7 @@ setSuccessMessage(
 
                           <button
                             type="button"
-                            className="file-preview-btn"
+                            className="file-preview-btn docuvio-btn-secondary"
                             onClick={() =>
                               handlePreview(file)
                             }
@@ -1107,6 +1252,72 @@ setSuccessMessage(
               </div>
             </section>
           )}
+
+            </main>
+
+            {!isExpired && (
+              <aside className="session-side-panel">
+                <div className="session-side-card session-side-current">
+                  <span className="session-side-eyebrow">
+                    CURRENT STEP
+                  </span>
+
+                  <div className="session-side-number">
+                    {currentStepIndex + 1}
+                  </div>
+
+                  <h3>
+                    {SESSION_STEPS[currentStepIndex]?.label}
+                  </h3>
+
+                  <p>
+                    {statusLabel}
+                  </p>
+                </div>
+
+                <div className="session-side-card">
+                  <span className="session-side-eyebrow">
+                    COMING NEXT
+                  </span>
+
+                  <h3>
+                    {currentStepIndex < SESSION_STEPS.length - 1
+                      ? SESSION_STEPS[currentStepIndex + 1].label
+                      : "Complete your print session"}
+                  </h3>
+
+                  <p>
+                    {currentStepIndex < SESSION_STEPS.length - 1
+                      ? "Finish the current step and Docuvio will move you forward automatically."
+                      : "Your request has reached the final stage."}
+                  </p>
+                </div>
+
+                <div className="session-side-card session-side-shop">
+                  <span className="session-side-eyebrow">
+                    PRINT SHOP
+                  </span>
+
+                  <h3>
+                    {session.shop?.shop_name ||
+                      session.shop_name ||
+                      "Print Shop"}
+                  </h3>
+
+                  {session.shop?.level && (
+                    <p>
+                      Level {session.shop.level}
+                    </p>
+                  )}
+
+                  <span className="session-side-status">
+                    <i />
+                    {statusLabel}
+                  </span>
+                </div>
+              </aside>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1172,7 +1383,7 @@ setSuccessMessage(
                     href={previewUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="session-primary-btn"
+                    className="session-primary-btn docuvio-btn-primary"
                   >
                     Open File
                   </a>
