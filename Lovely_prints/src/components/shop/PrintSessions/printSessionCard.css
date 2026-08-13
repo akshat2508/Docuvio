@@ -1,0 +1,177 @@
+/* ==========================================================
+   DOCUVIO SHOP — PRINT SESSION CARD
+========================================================== */
+
+.print-session-card-xz {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 13px 15px;
+  padding: 16px;
+  background: #fffdf8;
+}
+
+.print-session-card-customer {
+  grid-column: 1 / -1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.print-session-card-avatar {
+  width: 37px;
+  height: 37px;
+  min-width: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: rgba(139, 175, 41, 0.13);
+  color: #637d17;
+}
+
+.print-session-card-customer-copy {
+  min-width: 0;
+}
+
+.print-session-card-xz h3 {
+  margin: 0 0 3px;
+  color: #201d1e;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.print-session-card-xz p {
+  margin: 0;
+  color: #7c756e;
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-card-status-xz {
+  grid-column: 1;
+  justify-self: start;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 25px;
+  padding: 0 9px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .35px;
+  white-space: nowrap;
+}
+
+.session-card-status-xz > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.session-card-status-xz.neutral {
+  background: rgba(32,29,30,.07);
+  color: #625c56;
+}
+
+.session-card-status-xz.files {
+  background: rgba(120,153,186,.13);
+  color: #526e8b;
+}
+
+.session-card-status-xz.review {
+  background: rgba(254,195,69,.19);
+  color: #846000;
+}
+
+.session-card-status-xz.payment {
+  background: rgba(214,107,107,.12);
+  color: #a14e4e;
+}
+
+.session-card-status-xz.paid {
+  background: rgba(139,175,41,.14);
+  color: #587014;
+}
+
+.session-card-time-xz {
+  grid-column: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #8b847d;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.print-session-review-btn-xz {
+  grid-column: 3;
+  justify-self: end;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 10px;
+  background: #201d1e;
+  color: white;
+  font-size: 9px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: background .16s ease, transform .16s ease;
+}
+
+.print-session-review-btn-xz:hover {
+  background: #8caf29;
+}
+
+.print-session-review-btn-xz:active {
+  transform: scale(.97);
+}
+
+.print-session-review-btn-xz:focus-visible {
+  outline: 3px solid rgba(139,175,41,.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .print-session-card-xz {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 10px 12px;
+    padding: 15px;
+  }
+
+  .session-card-status-xz {
+    grid-column: 1;
+  }
+
+  .session-card-time-xz {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .print-session-review-btn-xz {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

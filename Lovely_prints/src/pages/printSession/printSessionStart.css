@@ -1,0 +1,946 @@
+/* ==========================================================
+   DOCUVIO PRINT SESSION START
+   Landing-page visual language aligned with the main Docuvio
+   homepage: parchment background, grid, sage/lime CTA,
+   warm yellow accents, rounded cards.
+========================================================== */
+
+:root {
+  --start-parchment: #f5f0e8;
+  --start-surface: #fffdf8;
+  --start-ink: #201d1e;
+  --start-ink-70: #6f6a64;
+  --start-ink-50: #96908a;
+  --start-sage: #8caf29;
+  --start-sage-dark: #73951b;
+  --start-sage-soft: rgba(139, 175, 41, 0.12);
+  --start-gold: #fec345;
+  --start-gold-soft: rgba(254, 195, 69, 0.18);
+  --start-coral: #e57373;
+  --start-border: rgba(32, 29, 30, 0.13);
+  --start-shadow: 0 24px 65px rgba(32, 29, 30, 0.09);
+  --start-radius-xl: 30px;
+  --start-radius-lg: 22px;
+}
+
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.print-session-start-page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 0 34px 40px;
+  background: var(--start-parchment);
+  color: var(--start-ink);
+}
+
+.start-grid-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.72;
+  background-image:
+    linear-gradient(rgba(32, 29, 30, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32, 29, 30, 0.075) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+/* ==========================================================
+   NAV
+========================================================== */
+
+.print-session-start-nav {
+  position: relative;
+  z-index: 10;
+  width: min(1420px, 100%);
+  min-height: 78px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(32, 29, 30, 0.11);
+}
+
+.start-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--start-ink);
+  text-decoration: none;
+}
+
+.start-brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.start-brand span {
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -0.7px;
+}
+
+.start-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.start-nav-login,
+.start-nav-register {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.start-nav-login {
+  border: 1px solid var(--start-border);
+  background: rgba(255, 253, 248, 0.62);
+  color: var(--start-ink);
+}
+
+.start-nav-register {
+  background: var(--start-sage);
+  color: white;
+  box-shadow: 0 8px 18px rgba(139, 175, 41, 0.22);
+}
+
+.start-nav-register:hover {
+  background: var(--start-sage-dark);
+}
+
+/* ==========================================================
+   MAIN HERO
+========================================================== */
+
+.print-session-start-main {
+  position: relative;
+  z-index: 1;
+  width: min(1420px, 100%);
+  margin: 0 auto;
+}
+
+.start-hero {
+  min-height: calc(100vh - 120px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(460px, 0.75fr);
+  align-items: center;
+  gap: clamp(50px, 7vw, 120px);
+  padding: 58px 0 50px;
+}
+
+.start-hero-copy {
+  max-width: 680px;
+}
+
+.start-eyebrow,
+.start-card-eyebrow,
+.start-workflow-heading span,
+.start-account-note > div:first-child span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.start-eyebrow {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--start-ink);
+  color: var(--start-gold);
+}
+
+.start-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--start-sage);
+}
+
+.start-hero h1 {
+  max-width: 750px;
+  margin: 24px 0 20px;
+  font-size: clamp(62px, 7.8vw, 118px);
+  line-height: 0.88;
+  letter-spacing: -6px;
+  font-weight: 950;
+}
+
+.start-hero h1 span {
+  color: var(--start-sage);
+}
+
+.start-hero-description {
+  max-width: 590px;
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.start-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 28px;
+}
+
+.start-benefit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid var(--start-border);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.62);
+  color: var(--start-ink-70);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.start-benefit span {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--start-sage-soft);
+  color: var(--start-sage-dark);
+}
+
+/* ==========================================================
+   APP CARD
+========================================================== */
+
+.start-app-card {
+  max-width: 560px;
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 14px;
+  border: 1px solid var(--start-border);
+  border-radius: 17px;
+  background: rgba(255, 253, 248, 0.72);
+  box-shadow: 0 10px 28px rgba(32, 29, 30, 0.05);
+}
+
+.start-app-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: var(--start-ink);
+  color: var(--start-gold);
+}
+
+.start-app-copy strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.start-app-copy p {
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.start-app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: var(--start-sage-soft);
+  color: #4c650d;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   START CARD
+========================================================== */
+
+.print-session-start-card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 31px;
+  border: 1px solid var(--start-border);
+  border-radius: var(--start-radius-xl);
+  background: rgba(255, 253, 248, 0.95);
+  box-shadow: var(--start-shadow);
+}
+
+.start-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.start-card-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--start-ink-50);
+}
+
+.start-card-top h2 {
+  margin: 0 0 8px;
+  font-size: 31px;
+  line-height: 1.08;
+  letter-spacing: -1px;
+  font-weight: 900;
+}
+
+.start-card-top p {
+  max-width: 390px;
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.start-session-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: var(--start-sage-soft);
+  color: #526b10;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.start-session-badge span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--start-sage);
+  box-shadow: 0 0 0 4px rgba(139, 175, 41, 0.12);
+}
+
+/* ==========================================================
+   WORKFLOW
+========================================================== */
+
+.start-workflow {
+  margin-top: 28px;
+  padding: 17px;
+  border: 1px solid var(--start-border);
+  border-radius: 18px;
+  background: #faf7ef;
+}
+
+.start-workflow-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.start-workflow-heading span {
+  color: var(--start-ink-50);
+}
+
+.start-workflow-heading strong {
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.start-workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.start-workflow-step {
+  position: relative;
+  min-width: 0;
+  padding-right: 12px;
+}
+
+.start-step-marker {
+  position: relative;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: var(--start-gold-soft);
+  color: #795400;
+}
+
+.start-workflow-step:nth-child(2) .start-step-marker {
+  background: var(--start-sage-soft);
+  color: var(--start-sage-dark);
+}
+
+.start-workflow-step:nth-child(3) .start-step-marker {
+  background: rgba(229, 115, 115, 0.12);
+  color: #a64d4d;
+}
+
+.start-step-line {
+  position: absolute;
+  z-index: 1;
+  left: 34px;
+  right: 8px;
+  top: 17px;
+  height: 1px;
+  background: rgba(32, 29, 30, 0.12);
+}
+
+.start-step-content {
+  position: relative;
+  z-index: 3;
+}
+
+.start-step-content > span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--start-ink-50);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.start-step-content strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.start-step-content p {
+  max-width: 150px;
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* ==========================================================
+   ACCOUNT BENEFIT
+========================================================== */
+
+.start-account-note {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 17px;
+  padding: 12px 13px;
+  border-radius: 15px;
+  background: var(--start-sage-soft);
+}
+
+.start-account-icon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: white;
+  color: var(--start-sage-dark);
+}
+
+.start-account-note strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.start-account-note p {
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+/* ==========================================================
+   BUTTON / ERROR
+========================================================== */
+
+.print-session-start-error {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border: 1px solid rgba(229, 115, 115, 0.3);
+  border-radius: 12px;
+  background: rgba(229, 115, 115, 0.09);
+  color: #a64d4d;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.print-session-start-button {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: var(--start-sage);
+  color: white;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 9px 20px rgba(139, 175, 41, 0.2);
+  transition: transform 0.16s, background 0.16s, box-shadow 0.16s;
+}
+
+.print-session-start-button:hover {
+  background: var(--start-sage-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(139, 175, 41, 0.24);
+}
+
+.print-session-start-button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.start-button-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: start-spin 0.75s linear infinite;
+}
+
+@keyframes start-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.print-session-start-note {
+  margin: 10px 0 0;
+  color: var(--start-ink-50);
+  text-align: center;
+  font-size: 9px;
+}
+
+/* ==========================================================
+   BOTTOM STRIP
+========================================================== */
+
+.start-bottom-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  border-top: 1px solid var(--start-border);
+  border-bottom: 1px solid var(--start-border);
+}
+
+.start-bottom-strip span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--start-ink-50);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.start-bottom-strip strong {
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.start-bottom-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--start-sage-dark);
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+/* ==========================================================
+   LOGIN / REGISTER PROMPT
+========================================================== */
+
+.start-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(32, 29, 30, 0.46);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.start-login-modal {
+  position: relative;
+  width: min(430px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(32, 29, 30, 0.14);
+  border-radius: 25px;
+  background: var(--start-surface);
+  box-shadow: 0 30px 80px rgba(32, 29, 30, 0.22);
+}
+
+.start-login-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 31px;
+  height: 31px;
+  border: 1px solid var(--start-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--start-ink-70);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.start-login-modal-icon {
+  width: 43px;
+  height: 43px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--start-sage-soft);
+  color: var(--start-sage-dark);
+}
+
+.start-login-modal-eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--start-ink-50);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+}
+
+.start-login-modal h2 {
+  margin: 0 0 9px;
+  font-size: 27px;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  font-weight: 900;
+}
+
+.start-login-modal > p {
+  margin: 0;
+  color: var(--start-ink-70);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.start-login-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 14px;
+  border-radius: 15px;
+  background: #faf7ef;
+}
+
+.start-login-features div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--start-ink-70);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.start-login-features svg {
+  color: var(--start-sage-dark);
+  flex-shrink: 0;
+}
+
+.start-login-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 0.7fr;
+  gap: 8px;
+}
+
+.start-modal-primary,
+.start-modal-secondary {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.start-modal-primary {
+  background: var(--start-sage);
+  color: white;
+}
+
+.start-modal-secondary {
+  border: 1px solid var(--start-border);
+  background: white;
+  color: var(--start-ink);
+}
+
+.start-continue-guest {
+  width: 100%;
+  margin-top: 9px;
+  padding: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--start-ink-50);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1050px) {
+  .print-session-start-page {
+    padding: 0 20px 32px;
+  }
+
+  .start-hero {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    padding-top: 45px;
+  }
+
+  .start-hero-copy {
+    max-width: 850px;
+  }
+
+  .start-hero h1 {
+    font-size: clamp(60px, 10vw, 92px);
+  }
+
+  .print-session-start-card {
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 680px) {
+  .print-session-start-page {
+    padding: 0 12px 25px;
+  }
+
+  .print-session-start-nav {
+    min-height: 66px;
+  }
+
+  .start-brand img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .start-brand span {
+    font-size: 20px;
+  }
+
+  .start-nav-login {
+    display: none;
+  }
+
+  .start-nav-register {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .start-hero {
+    min-height: auto;
+    gap: 24px;
+    padding: 38px 0 28px;
+  }
+
+  .start-eyebrow {
+    padding: 8px 11px;
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+
+  .start-hero h1 {
+    margin-top: 19px;
+    font-size: clamp(50px, 17vw, 76px);
+    letter-spacing: -3.5px;
+  }
+
+  .start-hero-description {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .start-benefits {
+    gap: 6px;
+  }
+
+  .start-benefit {
+    font-size: 9px;
+    padding: 7px 9px;
+  }
+
+  .start-app-card {
+    grid-template-columns: auto 1fr;
+    margin-top: 24px;
+  }
+
+  .start-app-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .print-session-start-card {
+    padding: 20px;
+    border-radius: 23px;
+  }
+
+  .start-card-top {
+    flex-direction: column;
+  }
+
+  .start-card-top h2 {
+    font-size: 27px;
+  }
+
+  .start-session-badge {
+    align-self: flex-start;
+  }
+
+  .start-workflow {
+    margin-top: 21px;
+    padding: 13px;
+  }
+
+  .start-workflow-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .start-workflow-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .start-workflow-step {
+    padding-right: 6px;
+  }
+
+  .start-step-line {
+    right: 3px;
+  }
+
+  .start-step-content strong {
+    font-size: 10px;
+  }
+
+  .start-step-content p {
+    font-size: 8px;
+  }
+
+  .start-account-note {
+    align-items: flex-start;
+  }
+
+  .start-bottom-strip {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    margin-top: 8px;
+  }
+
+  .start-bottom-link {
+    justify-self: start;
+  }
+
+  .start-login-overlay {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .start-login-modal {
+    padding: 23px 19px 18px;
+    border-radius: 22px;
+  }
+
+  .start-login-modal h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 390px) {
+  .start-hero h1 {
+    font-size: 48px;
+  }
+
+  .start-benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .start-benefit:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .start-workflow-step {
+    padding-right: 3px;
+  }
+
+  .start-step-content strong {
+    font-size: 9px;
+  }
+
+  .start-step-content p {
+    font-size: 7px;
+  }
+
+  .start-login-modal-actions {
+    grid-template-columns: 1fr;
+  }
+}

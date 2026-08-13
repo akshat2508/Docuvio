@@ -836,7 +836,7 @@ if (!shop || !shopOptions) {
 
         {/* RIGHT SIDE SUMMARY */}
         <div className="create-right">
-          <div className="summary-card">
+          <div className="summary-card-S">
             <h3>Order Summary</h3>
 
             {selectedPaper && (

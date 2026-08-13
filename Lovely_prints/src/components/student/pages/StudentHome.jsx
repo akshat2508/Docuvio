@@ -7,6 +7,7 @@ import OpenPoliciesModal from "../modals/OpenPoliciesModal";
 
 import "./studentHome.css";
 
+
 const StudentHome = () => {
   const navigate = useNavigate();
   const { shops, shopsLoading, fetchShops, setFlowStage } = useStudentData();
@@ -83,6 +84,7 @@ const getShopBanner = (shop) => {
 };
   return (
     <div className="student-home">
+
 
       <h1 className="student-home-title">Choose a Print Shop</h1>
 

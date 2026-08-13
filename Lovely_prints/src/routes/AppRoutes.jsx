@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../components/auth/Login";
 import Signup from "../components/auth/Signup";
-
+import PrintSessionPage from "../components/printSession/PrintSessionPage";
 import StudentLayout from "../components/student/layout/StudentLayout";
 import StudentHome from "../components/student/pages/StudentHome";
 import ShopDetails from "../components/student/pages/ShopDetails";
@@ -20,6 +20,7 @@ import WalkInOrderPage from "../components/student/modals/WalkInOrderPage";
 import NotFound from "../pages/NotFound";
 import EmailVerified from "../components/auth/EmailVerified";
 import AcceptInvite from "../components/auth/AcceptInvite";
+import PrintSessionStart from "../pages/printSession/PrintSessionStart";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -29,6 +30,15 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/update-password" element={<ResetPassword />} />
+        {/* PRINT SESSION */}
+        <Route
+            path="/print/shop/:shopId"
+            element={<PrintSessionStart/>}
+          />
+      <Route
+        path="/print-session/:sessionToken"
+        element={<PrintSessionPage />}
+      />
 
       {/* Student (Protected) */}
       <Route element={<ProtectedRoute role="student" />}>
