@@ -91,14 +91,13 @@ app.use(
   "/api/print-sessions",
   printSessionRoutes
 );
-app.use('/api/auth',authLimiter, authRoutes);
+app.use('/api/auth', authRoutes);
 app.use("/api/auth", authRoutes);
 app.use('/api/students',pollingLimiter, studentRoutes);
 app.use('/api/shops',pollingLimiter, shopRoutes);
 app.use('/api/orders',pollingLimiter, orderRoutes);
 app.use('/api/files',apiLimiter, fileRoutes);
 app.use('/api/documents',apiLimiter, documentRoutes);
-// app.use('/api', printOptionRoutes);
 app.use('/api/print-options', printOptionsRoutes);
 app.use('/api/shops', paperTypeRoutes);
 app.use('/api/shops', colorModeRoutes);
