@@ -1,4 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Check,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  IndianRupee,
+  UserRound,
+  X,
+} from "lucide-react";
+import { createPortal } from "react-dom";
 
 import {
   getPrintSession,
@@ -9,7 +19,6 @@ import {
 } from "../../../services/printSessionService";
 
 import "./printSessions.css";
-import { createPortal } from "react-dom";
 
 /* =========================================================
    HELPERS
@@ -45,10 +54,50 @@ const formatDate = (date) => {
   });
 };
 
-const formatStatus = (status = "") => {
-  return status
+const formatStatus = (status = "") =>
+  status
     .replaceAll("_", " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const PAID_STATUSES = [
+  "paid",
+  "printing",
+  "ready_for_pickup",
+  "completed",
+];
+
+const isPaidStatus = (status) =>
+  PAID_STATUSES.includes(status);
+
+const getReviewStage = (status) => {
+  if (
+    [
+      "created",
+      "connected",
+      "customer_details",
+      "files_uploading",
+      "files_uploaded",
+    ].includes(status)
+  ) {
+    return 1;
+  }
+
+  if (status === "reviewing") {
+    return 2;
+  }
+
+  if (
+    status === "quote_ready" ||
+    status === "payment_pending"
+  ) {
+    return 3;
+  }
+
+  if (PAID_STATUSES.includes(status)) {
+    return 4;
+  }
+
+  return 1;
 };
 
 /* =========================================================
@@ -61,34 +110,24 @@ const PrintSessionReview = ({
   onUpdated,
 }) => {
   const [sessionData, setSessionData] = useState(session);
-
   const [files, setFiles] = useState([]);
 
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-  /* =======================================================
-     FILE PREVIEW
-  ======================================================= */
-
+  /* FILE PREVIEW */
   const [previewFile, setPreviewFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState("");
 
-  /* =======================================================
-     QUOTATION
-  ======================================================= */
-
+  /* QUOTATION */
   const [quotedAmount, setQuotedAmount] = useState(
     session?.quoted_amount || ""
   );
 
   const [quoteLoading, setQuoteLoading] = useState(false);
-
   const [quoteError, setQuoteError] = useState("");
-
   const [quoteSuccess, setQuoteSuccess] = useState("");
 
   /* =======================================================
@@ -111,13 +150,8 @@ const PrintSessionReview = ({
           sessionResponse,
           filesResponse,
         ] = await Promise.all([
-          getPrintSession(
-            session.session_token
-          ),
-
-          getSessionFiles(
-            session.session_token
-          ),
+          getPrintSession(session.session_token),
+          getSessionFiles(session.session_token),
         ]);
 
         const updatedSession =
@@ -129,9 +163,7 @@ const PrintSessionReview = ({
           updatedSession?.quoted_amount || ""
         );
 
-        setFiles(
-          filesResponse?.data || []
-        );
+        setFiles(filesResponse?.data || []);
       } catch (err) {
         console.error(
           "Failed to load print session review:",
@@ -158,27 +190,22 @@ const PrintSessionReview = ({
   const handlePreview = async (file) => {
     try {
       setPreviewLoading(true);
-
       setPreviewError("");
-
       setPreviewFile(file);
-
       setPreviewUrl("");
 
-      const url = await getSessionFileUrl(
-        file.id
-      );
+      const url = await getSessionFileUrl(file.id);
 
       setPreviewUrl(url);
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Failed to load file preview:",
-        error
+        err
       );
 
       setPreviewError(
-        error?.response?.data?.message ||
-          error?.message ||
+        err?.response?.data?.message ||
+          err?.message ||
           "Unable to preview this file."
       );
     } finally {
@@ -188,81 +215,56 @@ const PrintSessionReview = ({
 
   const closePreview = () => {
     setPreviewFile(null);
-
     setPreviewUrl("");
-
     setPreviewError("");
   };
 
   /* =======================================================
      START REVIEW
-     
-     ONLY VALID FROM:
-     
      files_uploaded → reviewing
   ======================================================= */
 
   const handleStartReview = async () => {
     if (!sessionData?.session_token) {
-      setQuoteError(
-        "Print session token is missing."
-      );
-
+      setQuoteError("Print session token is missing.");
       return;
     }
 
-    /*
-     * Frontend safety check.
-     *
-     * The backend still remains the final authority.
-     */
-
-    if (
-      sessionData.status !==
-      "files_uploaded"
-    ) {
+    if (sessionData.status !== "files_uploaded") {
       setQuoteError(
         `Cannot start review from status ${sessionData.status}.`
       );
-
       return;
     }
 
     try {
       setQuoteLoading(true);
-
       setQuoteError("");
-
       setQuoteSuccess("");
 
-      const response =
-        await startSessionReview(
-          sessionData.session_token
-        );
+      const response = await startSessionReview(
+        sessionData.session_token
+      );
 
-      const updatedSession =
-        response?.data;
+      const updatedSession = response?.data;
 
       if (updatedSession) {
-        setSessionData(
-          updatedSession
-        );
-
+        setSessionData(updatedSession);
         setQuotedAmount(
           updatedSession?.quoted_amount || ""
         );
       }
 
       onUpdated?.();
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Failed to start print session review:",
-        error
+        err
       );
 
       setQuoteError(
-        error?.response?.data?.message ||
-          error?.message ||
+        err?.response?.data?.message ||
+          err?.message ||
           "Unable to start session review."
       );
     } finally {
@@ -272,90 +274,54 @@ const PrintSessionReview = ({
 
   /* =======================================================
      SUBMIT QUOTATION
-     
-     ONLY VALID FROM:
-     
      reviewing → quote_ready
   ======================================================= */
 
   const handleSubmitQuote = async () => {
-    const amount = Number(
-      quotedAmount
-    );
+    const amount = Number(quotedAmount);
 
     if (!amount || amount <= 0) {
       setQuoteError(
         "Please enter a valid quotation amount."
       );
-
       return;
     }
 
     if (!sessionData?.session_token) {
-      setQuoteError(
-        "Print session token is missing."
-      );
-
+      setQuoteError("Print session token is missing.");
       return;
     }
 
-    /*
-     * Frontend safety check.
-     */
-
-    if (
-      sessionData.status !==
-      "reviewing"
-    ) {
+    if (sessionData.status !== "reviewing") {
       setQuoteError(
         `Cannot submit quotation from status ${sessionData.status}.`
       );
-
       return;
     }
 
     try {
       setQuoteLoading(true);
-
       setQuoteError("");
-
       setQuoteSuccess("");
 
-      const response =
-        await submitSessionQuote(
-          sessionData.session_token,
-          amount
-        );
+      const response = await submitSessionQuote(
+        sessionData.session_token,
+        amount
+      );
 
-      const updatedSession =
-        response?.data;
+      const updatedSession = response?.data;
 
       if (updatedSession) {
-        setSessionData(
-          updatedSession
-        );
-
+        setSessionData(updatedSession);
         setQuotedAmount(
-          updatedSession?.quoted_amount ||
-            amount
+          updatedSession?.quoted_amount || amount
         );
       } else {
-        /*
-         * Fallback in case backend doesn't
-         * return the updated session.
-         */
-
-        setSessionData(
-          (prev) => ({
-            ...prev,
-
-            status:
-              "quote_ready",
-
-            quoted_amount:
-              amount,
-          })
-        );
+        setSessionData((prev) => ({
+          ...prev,
+          status: "quote_ready",
+          quoted_amount: amount,
+        }));
       }
 
       setQuoteSuccess(
@@ -363,15 +329,15 @@ const PrintSessionReview = ({
       );
 
       onUpdated?.();
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Failed to submit quotation:",
-        error
+        err
       );
 
       setQuoteError(
-        error?.response?.data?.message ||
-          error?.message ||
+        err?.response?.data?.message ||
+          err?.message ||
           "Unable to submit quotation."
       );
     } finally {
@@ -380,101 +346,201 @@ const PrintSessionReview = ({
   };
 
   /* =======================================================
-     NULL SESSION
+     STATUS
   ======================================================= */
 
   if (!session) {
     return null;
   }
 
-  /* =======================================================
-     CURRENT STATUS
-  ======================================================= */
-
-  const currentStatus =
-    sessionData?.status;
+  const currentStatus = sessionData?.status;
+  const currentStage = getReviewStage(currentStatus);
+  const paid = isPaidStatus(currentStatus);
 
   const isFilesUploaded =
-    currentStatus ===
-    "files_uploaded";
+    currentStatus === "files_uploaded";
 
   const isReviewing =
-    currentStatus ===
-    "reviewing";
+    currentStatus === "reviewing";
 
   const isQuoteReady =
-    currentStatus ===
-    "quote_ready";
+    currentStatus === "quote_ready";
 
   const isPaymentPending =
-    currentStatus ===
-    "payment_pending";
+    currentStatus === "payment_pending";
 
-  const isPaid =
-    currentStatus ===
-    "paid";
+  const isPaid = paid;
 
-  /* =======================================================
-     RENDER
-  ======================================================= */
+  const statusText = useMemo(
+    () => formatStatus(currentStatus || "unknown"),
+    [currentStatus]
+  );
+
+  const stageItems = [
+    {
+      number: 1,
+      title: "Files",
+      description: "Customer submission",
+    },
+    {
+      number: 2,
+      title: "Review",
+      description: "Shop checks files",
+    },
+    {
+      number: 3,
+      title: "Quote",
+      description: "Customer gets price",
+    },
+    {
+      number: 4,
+      title: "Payment",
+      description: "Ready to print",
+    },
+  ];
 
   return createPortal(
     <div className="print-session-review-overlay">
-
-      <div className="print-session-review-modal">
+      <div
+        className={`print-session-review-modal ${
+          paid
+            ? "review-modal-paid"
+            : "review-modal-unpaid"
+        }`}
+      >
 
         {/* =================================================
             HEADER
         ================================================= */}
 
-        <div className="review-header">
-
-          <div>
-
+        <header className="review-header">
+          <div className="review-header-main">
             <span className="review-eyebrow">
               PRINT SESSION REVIEW
             </span>
 
-            <h2>
-              {sessionData?.customer_name ||
-                "Customer"}
-            </h2>
+            <div className="review-title-row">
+              <div className="review-customer-avatar">
+                <UserRound size={18} />
+              </div>
 
-            <p>
-              Review the customer's files before
-              preparing the final quotation.
-            </p>
+              <div>
+                <h2>
+                  {sessionData?.customer_name ||
+                    "Customer"}
+                </h2>
 
+                <p>
+                  {sessionData?.customer_phone ||
+                    "No phone provided"}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            className="review-close-btn"
-            onClick={onClose}
-          >
-            ×
-          </button>
+          <div className="review-header-actions">
+            <div
+              className={
+                paid
+                  ? "review-payment-badge paid"
+                  : "review-payment-badge unpaid"
+              }
+            >
+              {paid ? (
+                <>
+                  <CheckCircle2 size={12} />
+                  Paid
+                </>
+              ) : (
+                <>
+                  <Clock3 size={12} />
+                  Unpaid
+                </>
+              )}
+            </div>
 
+            <button
+              type="button"
+              className="review-close-btn"
+              onClick={onClose}
+              aria-label="Close review"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </header>
+
+        {/* =================================================
+            STAGE TIMELINE
+        ================================================= */}
+
+        <div className="review-timeline-wrap">
+          <div className="review-timeline">
+            {stageItems.map((stage, index) => {
+              const completed =
+                stage.number < currentStage;
+
+              const active =
+                stage.number === currentStage;
+
+              return (
+                <div
+                  key={stage.number}
+                  className={`review-timeline-step ${
+                    completed
+                      ? "completed"
+                      : ""
+                  } ${
+                    active
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <div className="review-timeline-node">
+                    {completed ? (
+                      <Check size={13} />
+                    ) : (
+                      stage.number
+                    )}
+                  </div>
+
+                  <div className="review-timeline-copy">
+                    <strong>
+                      {stage.title}
+                    </strong>
+
+                    <span>
+                      {stage.description}
+                    </span>
+                  </div>
+
+                  {index < stageItems.length - 1 && (
+                    <div className="review-timeline-line" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* =================================================
-            ERROR
+            MESSAGES
         ================================================= */}
 
         {error && (
-          <div className="review-error">
+          <div className="review-alert review-alert-error">
             {error}
           </div>
         )}
 
         {quoteError && (
-          <div className="review-error">
+          <div className="review-alert review-alert-error">
             {quoteError}
           </div>
         )}
 
         {quoteSuccess && (
-          <div className="review-success">
+          <div className="review-alert review-alert-success">
             {quoteSuccess}
           </div>
         )}
@@ -484,178 +550,117 @@ const PrintSessionReview = ({
         ================================================= */}
 
         {loading ? (
-
           <div className="review-loading">
-
             <div className="review-spinner" />
-
-            <p>
-              Loading session details...
-            </p>
-
+            <p>Loading session details...</p>
           </div>
-
         ) : (
-
           <>
 
-            {/* =============================================
-                CUSTOMER DETAILS
-            ============================================= */}
-
+            {/* CUSTOMER */}
             <section className="review-section">
-
               <div className="review-section-heading">
-
                 <div className="review-section-number">
                   1
                 </div>
 
                 <div>
-
-                  <h3>
-                    Customer Details
-                  </h3>
-
+                  <h3>Customer Details</h3>
                   <p>
-                    Information provided by the
-                    customer.
+                    Information provided for this
+                    print request.
                   </p>
-
                 </div>
-
               </div>
 
               <div className="review-customer-grid">
-
                 <div className="review-info-card">
-
-                  <span>
-                    Name
-                  </span>
-
+                  <span>Name</span>
                   <strong>
                     {sessionData?.customer_name ||
                       "Not provided"}
                   </strong>
-
                 </div>
 
                 <div className="review-info-card">
-
-                  <span>
-                    Phone
-                  </span>
-
+                  <span>Phone</span>
                   <strong>
                     {sessionData?.customer_phone ||
                       "Not provided"}
                   </strong>
-
                 </div>
 
                 <div className="review-info-card">
-
-                  <span>
-                    Status
-                  </span>
-
+                  <span>Current Stage</span>
                   <strong className="review-status">
-
-                    {formatStatus(
-                      sessionData?.status ||
-                        "unknown"
-                    )}
-
+                    {statusText}
                   </strong>
-
                 </div>
 
                 <div className="review-info-card">
-
-                  <span>
-                    Created
-                  </span>
-
+                  <span>Created</span>
                   <strong>
                     {formatDate(
                       sessionData?.created_at
                     )}
                   </strong>
-
                 </div>
-
               </div>
-
             </section>
 
-            {/* =============================================
-                FILES
-            ============================================= */}
-
+            {/* FILES */}
             <section className="review-section">
-
               <div className="review-section-heading">
-
                 <div className="review-section-number">
                   2
                 </div>
 
                 <div>
-
-                  <h3>
-                    Uploaded Files
-                  </h3>
-
+                  <h3>Uploaded Files</h3>
                   <p>
                     Documents submitted by the
-                    customer for printing.
+                    customer.
                   </p>
-
                 </div>
 
+                <div className="review-section-count">
+                  {files.length}{" "}
+                  {files.length === 1
+                    ? "file"
+                    : "files"}
+                </div>
               </div>
 
               {files.length === 0 ? (
-
                 <div className="review-empty-files">
-
                   No files were uploaded for this
                   session.
-
                 </div>
-
               ) : (
-
                 <div className="review-file-list">
-
                   {files.map((file) => (
-
                     <div
                       key={file.id}
                       className="review-file-item"
                     >
-
                       <div className="review-file-icon">
-
-                        {getFileExtension(
-                          file.file_name ||
-                            file.original_filename
-                        )}
-
+                        <FileText size={16} />
                       </div>
 
                       <div className="review-file-info">
-
                         <strong>
-
                           {file.file_name ||
                             file.original_filename ||
                             "Unnamed file"}
-
                         </strong>
 
                         <span>
+                          {getFileExtension(
+                            file.file_name ||
+                              file.original_filename
+                          )}
+
+                          {" • "}
 
                           {formatFileSize(
                             file.file_size
@@ -663,9 +668,7 @@ const PrintSessionReview = ({
 
                           {file.mime_type &&
                             ` • ${file.mime_type}`}
-
                         </span>
-
                       </div>
 
                       <button
@@ -677,536 +680,376 @@ const PrintSessionReview = ({
                       >
                         Preview
                       </button>
-
                     </div>
-
                   ))}
-
                 </div>
-
               )}
-
             </section>
 
-            {/* =============================================
-                QUOTATION
-            ============================================= */}
-
+            {/* QUOTATION */}
             <section className="review-section quotation-section">
-
               <div className="review-section-heading">
-
                 <div className="review-section-number">
                   3
                 </div>
 
                 <div>
-
-                  <h3>
-                    Print Quotation
-                  </h3>
-
+                  <h3>Quotation & Payment</h3>
                   <p>
-                    Prepare and send the final amount
-                    to the customer.
+                    The customer cannot proceed to
+                    printing until payment is confirmed.
                   </p>
-
                 </div>
-
               </div>
 
-              {/* =========================================
-                  FILES UPLOADED
-                  
-                  START REVIEW
-              ========================================= */}
-
+              {/* FILES UPLOADED */}
               {isFilesUploaded && (
+                <div className="review-action-card">
+                  <div className="review-action-icon review-action-yellow">
+                    <FileText size={18} />
+                  </div>
 
-                <div className="quotation-start-card">
-
-                  <div>
-
+                  <div className="review-action-copy">
                     <strong>
-                      Ready to review this session?
+                      Ready for your review
                     </strong>
 
                     <p>
-                      Review the customer's files and
+                      Check the uploaded files and
                       prepare the final quotation.
                     </p>
-
                   </div>
 
                   <button
                     type="button"
                     className="review-primary-btn"
-                    onClick={
-                      handleStartReview
-                    }
-                    disabled={
-                      quoteLoading
-                    }
+                    onClick={handleStartReview}
+                    disabled={quoteLoading}
                   >
-
                     {quoteLoading
-                      ? "Starting Review..."
+                      ? "Starting..."
                       : "Start Review"}
-
                   </button>
-
                 </div>
-
               )}
 
-              {/* =========================================
-                  REVIEWING
-                  
-                  ENTER QUOTATION
-              ========================================= */}
-
+              {/* REVIEWING */}
               {isReviewing && (
-
                 <div className="quotation-form">
+                  <div className="quotation-form-top">
+                    <div>
+                      <strong>
+                        Set the final print price
+                      </strong>
 
-                  <div className="quotation-amount-field">
-
-                    <label htmlFor="quotedAmount">
-                      Final Amount
-                    </label>
-
-                    <div className="quotation-input-wrapper">
-
-                      <span>
-                        ₹
-                      </span>
-
-                      <input
-                        id="quotedAmount"
-                        type="number"
-                        min="1"
-                        step="0.01"
-                        placeholder="Enter amount"
-                        value={quotedAmount}
-                        onChange={(e) =>
-                          setQuotedAmount(
-                            e.target.value
-                          )
-                        }
-                        disabled={
-                          quoteLoading
-                        }
-                      />
-
+                      <p>
+                        This is the amount the customer
+                        will be asked to pay.
+                      </p>
                     </div>
-
                   </div>
 
-                  <p className="quotation-help">
+                  <label
+                    htmlFor="quotedAmount"
+                    className="quotation-label"
+                  >
+                    Final Amount
+                  </label>
 
-                    This will be the final amount the
-                    customer needs to pay.
-
-                  </p>
+                  <div className="quotation-input-wrapper">
+                    <IndianRupee size={15} />
+                    <input
+                      id="quotedAmount"
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      placeholder="Enter amount"
+                      value={quotedAmount}
+                      onChange={(event) =>
+                        setQuotedAmount(
+                          event.target.value
+                        )
+                      }
+                      disabled={quoteLoading}
+                    />
+                  </div>
 
                   <button
                     type="button"
                     className="quotation-submit-btn"
-                    onClick={
-                      handleSubmitQuote
-                    }
+                    onClick={handleSubmitQuote}
                     disabled={
                       quoteLoading ||
                       !quotedAmount ||
-                      Number(
-                        quotedAmount
-                      ) <= 0
+                      Number(quotedAmount) <= 0
                     }
                   >
-
                     {quoteLoading
                       ? "Sending Quotation..."
                       : "Send Quotation"}
-
                   </button>
-
                 </div>
-
               )}
 
-              {/* =========================================
-                  QUOTE READY
-                  
-                  CUSTOMER HAS RECEIVED QUOTE
-              ========================================= */}
-
+              {/* QUOTE READY */}
               {isQuoteReady && (
-
-                <div className="session-state-card session-state-info">
-
+                <div className="session-state-card session-state-quote">
                   <div className="session-state-icon">
-                    ₹
+                    <IndianRupee size={18} />
                   </div>
 
                   <div className="session-state-content">
+                    <div className="session-state-top">
+                      <strong>Quotation Sent</strong>
 
-                    <strong>
-                      Quotation Sent
-                    </strong>
-
-                    <p>
-                      The quotation has been sent to
-                      the customer. Waiting for the
-                      customer to complete payment.
-                    </p>
-
-                    {sessionData?.quoted_amount && (
-
-                      <div className="session-state-amount">
-
-                        ₹
-                        {Number(
-                          sessionData.quoted_amount
-                        ).toFixed(2)}
-
-                      </div>
-
-                    )}
-
-                  </div>
-
-                </div>
-
-              )}
-
-              {/* =========================================
-                  PAYMENT PENDING
-              ========================================= */}
-
-              {isPaymentPending && (
-
-                <div className="session-state-card session-state-info">
-
-                  <div className="session-state-icon">
-                    ₹
-                  </div>
-
-                  <div className="session-state-content">
-
-                    <strong>
-                      Waiting for Payment
-                    </strong>
+                      <span className="session-state-tag">
+                        Awaiting payment
+                      </span>
+                    </div>
 
                     <p>
                       The customer has received the
-                      quotation and needs to complete
-                      payment.
+                      quotation. Printing must wait
+                      until payment is confirmed.
                     </p>
 
                     {sessionData?.quoted_amount && (
-
                       <div className="session-state-amount">
-
                         ₹
                         {Number(
                           sessionData.quoted_amount
                         ).toFixed(2)}
-
                       </div>
-
                     )}
-
                   </div>
-
                 </div>
-
               )}
 
-              {/* =========================================
-                  PAID
-                  
-                  READY TO PRINT
-              ========================================= */}
-
-              {isPaid && (
-
-                <div className="session-state-card session-state-success">
-
+              {/* PAYMENT PENDING */}
+              {isPaymentPending && (
+                <div className="session-state-card session-state-quote">
                   <div className="session-state-icon">
-                    ✓
+                    <Clock3 size={18} />
                   </div>
 
                   <div className="session-state-content">
+                    <div className="session-state-top">
+                      <strong>
+                        Waiting for Payment
+                      </strong>
 
-                    <strong>
-                      Payment Received
-                    </strong>
+                      <span className="session-state-tag">
+                        Unpaid
+                      </span>
+                    </div>
 
                     <p>
-                      The customer has completed
-                      payment. This print session is
-                      ready for processing.
+                      The quotation is ready. Wait
+                      for the customer's payment before
+                      starting the print job.
                     </p>
 
                     {sessionData?.quoted_amount && (
-
                       <div className="session-state-amount">
-
                         ₹
                         {Number(
                           sessionData.quoted_amount
                         ).toFixed(2)}
-
                       </div>
-
                     )}
-
                   </div>
-
                 </div>
-
               )}
 
-              {/* =========================================
-                  UNKNOWN / EARLIER STATES
-              ========================================= */}
+              {/* PAID / PRINTING / PICKUP / COMPLETED */}
+              {isPaid && (
+                <div className="session-state-card session-state-success">
+                  <div className="session-state-icon">
+                    <CheckCircle2 size={19} />
+                  </div>
 
+                  <div className="session-state-content">
+                    <div className="session-state-top">
+                      <strong>
+                        {currentStatus === "paid"
+                          ? "Payment Received"
+                          : formatStatus(
+                              currentStatus
+                            )}
+                      </strong>
+
+                      <span className="session-state-tag">
+                        Paid
+                      </span>
+                    </div>
+
+                    <p>
+                      Payment has been confirmed.
+                      This session can now continue
+                      through the printing workflow.
+                    </p>
+
+                    {sessionData?.quoted_amount && (
+                      <div className="session-state-amount">
+                        ₹
+                        {Number(
+                          sessionData.quoted_amount
+                        ).toFixed(2)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* EARLIER / UNKNOWN */}
               {!isFilesUploaded &&
                 !isReviewing &&
                 !isQuoteReady &&
                 !isPaymentPending &&
                 !isPaid && (
-
-                  <div className="session-state-card session-state-info">
-
-                    <div className="session-state-content">
-
-                      <strong>
-                        Session Status
-                      </strong>
-
-                      <p>
-                        Current session status:
-                        {" "}
-                        {formatStatus(
-                          currentStatus ||
-                            "unknown"
-                        )}
-                      </p>
-
+                  <div className="session-state-card session-state-neutral">
+                    <div className="session-state-icon">
+                      <Clock3 size={18} />
                     </div>
 
+                    <div className="session-state-content">
+                      <strong>Session Status</strong>
+
+                      <p>
+                        Current session status:{" "}
+                        {statusText}
+                      </p>
+                    </div>
                   </div>
-
                 )}
-
             </section>
 
-            {/* =============================================
-                NEXT STEP
-            ============================================= */}
-
+            {/* NEXT STEP */}
             <section className="review-next-step">
+              <span>NEXT STEP</span>
 
-              <div>
+              {isFilesUploaded && (
+                <>
+                  <h3>
+                    Review the files and prepare
+                    the quotation
+                  </h3>
 
-                <span>
-                  NEXT STEP
-                </span>
+                  <p>
+                    Start the review when you are
+                    ready to set the final amount.
+                  </p>
+                </>
+              )}
 
-                {isFilesUploaded && (
+              {isReviewing && (
+                <>
+                  <h3>Send the quotation</h3>
 
-                  <>
-                    <h3>
-                      Review the files and prepare
-                      the quotation
-                    </h3>
+                  <p>
+                    Enter the final print amount and
+                    send it to the customer.
+                  </p>
+                </>
+              )}
 
-                    <p>
-                      Start the review when you are
-                      ready to prepare the customer's
-                      final amount.
-                    </p>
-                  </>
+              {(isQuoteReady ||
+                isPaymentPending) && (
+                <>
+                  <h3>
+                    Wait for customer payment
+                  </h3>
 
-                )}
+                  <p>
+                    The session remains unpaid until
+                    the payment is confirmed.
+                  </p>
+                </>
+              )}
 
-                {isReviewing && (
+              {isPaid && (
+                <>
+                  <h3>Ready to continue printing</h3>
 
-                  <>
-                    <h3>
-                      Send the quotation
-                    </h3>
-
-                    <p>
-                      Enter the final print amount and
-                      send it to the customer.
-                    </p>
-                  </>
-
-                )}
-
-                {isQuoteReady && (
-
-                  <>
-                    <h3>
-                      Waiting for customer payment
-                    </h3>
-
-                    <p>
-                      The quotation has been sent.
-                      The customer must complete payment
-                      before printing.
-                    </p>
-                  </>
-
-                )}
-
-                {isPaymentPending && (
-
-                  <>
-                    <h3>
-                      Waiting for customer payment
-                    </h3>
-
-                    <p>
-                      Payment is still pending.
-                      Printing should not begin yet.
-                    </p>
-                  </>
-
-                )}
-
-                {isPaid && (
-
-                  <>
-                    <h3>
-                      Ready to print
-                    </h3>
-
-                    <p>
-                      Payment has been confirmed.
-                      You can now process this print
-                      request.
-                    </p>
-                  </>
-
-                )}
-
-              </div>
-
+                  <p>
+                    Payment is confirmed. The session
+                    can now proceed through printing.
+                  </p>
+                </>
+              )}
             </section>
-
           </>
-
         )}
 
-        {/* =================================================
-            FOOTER
-        ================================================= */}
-
-        <div className="review-footer">
-
+        <footer className="review-footer">
           <button
             type="button"
             className="review-secondary-btn"
             onClick={onClose}
           >
-            Close
+            Close Review
           </button>
-
-        </div>
-
+        </footer>
       </div>
 
       {/* ===================================================
-          FILE PREVIEW MODAL
+          FILE PREVIEW
       =================================================== */}
 
       {previewFile && (
-
         <div className="file-preview-overlay">
-
           <div className="file-preview-modal">
-
             <div className="file-preview-header">
-
               <div>
-
                 <strong>
-
                   {previewFile.file_name ||
                     previewFile.original_filename ||
                     "File Preview"}
-
                 </strong>
 
                 <span>
                   {previewFile.mime_type || ""}
                 </span>
-
               </div>
 
               <button
                 type="button"
                 className="file-preview-close"
                 onClick={closePreview}
+                aria-label="Close preview"
               >
-                ×
+                <X size={17} />
               </button>
-
             </div>
 
             <div className="file-preview-content">
-
-              {/* LOADING */}
-
               {previewLoading && (
-
                 <div className="review-loading">
-
                   <div className="review-spinner" />
-
-                  <p>
-                    Loading preview...
-                  </p>
-
+                  <p>Loading preview...</p>
                 </div>
-
               )}
 
-              {/* ERROR */}
-
-              {!previewLoading &&
-                previewError && (
-
-                  <div className="preview-error">
-
-                    {previewError}
-
-                  </div>
-
-                )}
-
-              {/* PDF */}
+              {!previewLoading && previewError && (
+                <div className="preview-error">
+                  {previewError}
+                </div>
+              )}
 
               {!previewLoading &&
                 !previewError &&
                 previewUrl &&
                 previewFile.mime_type ===
                   "application/pdf" && (
-
                   <iframe
                     src={previewUrl}
                     title={
                       previewFile.file_name ||
-                      previewFile.original_filename
+                      previewFile.original_filename ||
+                      "PDF Preview"
                     }
                   />
-
                 )}
-
-              {/* IMAGE */}
 
               {!previewLoading &&
                 !previewError &&
@@ -1214,14 +1057,13 @@ const PrintSessionReview = ({
                 previewFile.mime_type?.startsWith(
                   "image/"
                 ) && (
-
                   <div className="image-preview-wrapper">
-
                     <img
                       src={previewUrl}
                       alt={
                         previewFile.file_name ||
-                        previewFile.original_filename
+                        previewFile.original_filename ||
+                        "Preview"
                       }
                     />
 
@@ -1238,12 +1080,8 @@ const PrintSessionReview = ({
                     >
                       Download Image
                     </a>
-
                   </div>
-
                 )}
-
-              {/* OTHER FILE TYPES */}
 
               {!previewLoading &&
                 !previewError &&
@@ -1253,12 +1091,8 @@ const PrintSessionReview = ({
                 ) &&
                 previewFile.mime_type !==
                   "application/pdf" && (
-
                   <div className="unsupported-preview">
-
-                    <h3>
-                      Preview unavailable
-                    </h3>
+                    <h3>Preview unavailable</h3>
 
                     <p>
                       This file type cannot be
@@ -1273,20 +1107,14 @@ const PrintSessionReview = ({
                     >
                       Open File
                     </a>
-
                   </div>
-
                 )}
-
             </div>
-
           </div>
-
         </div>
-
       )}
-
-    </div>,document.getElementById("modal-root")
+    </div>,
+    document.getElementById("modal-root")
   );
 };
 

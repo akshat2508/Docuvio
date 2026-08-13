@@ -1,56 +1,50 @@
-/* =========================================
-   PRINT SESSION CARD - XZ
-   ========================================= */
+/* ==========================================================
+   DOCUVIO SHOP — PRINT SESSION CARD
+========================================================== */
 
 .print-session-card-xz {
-  display: grid;
-
-  grid-template-columns: 1fr auto auto;
-  grid-template-rows: auto auto;
-
-  align-items: center;
-
-  gap: 16px;
-
   width: 100%;
   min-width: 0;
-
-  padding: 20px;
-
   box-sizing: border-box;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 13px 15px;
+  padding: 16px;
+  background: #fffdf8;
 }
 
-
-/* =========================================
-   CUSTOMER
-   ========================================= */
-
-.print-session-card-xz > div:first-child {
+.print-session-card-customer {
   grid-column: 1 / -1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.print-session-card-avatar {
+  width: 37px;
+  height: 37px;
+  min-width: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: rgba(139, 175, 41, 0.13);
+  color: #637d17;
+}
+
+.print-session-card-customer-copy {
   min-width: 0;
 }
 
 .print-session-card-xz h3 {
-  margin: 0 0 5px;
-
-  font-size: 17px;
-  line-height: 1.3;
-  font-weight: 650;
-
-  color: #111827;
-
+  margin: 0 0 3px;
+  color: #201d1e;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -58,143 +52,113 @@
 
 .print-session-card-xz p {
   margin: 0;
-
-  font-size: 14px;
+  color: #7c756e;
+  font-size: 10px;
   line-height: 1.4;
-
-  color: #6b7280;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-
-/* =========================================
-   STATUS
-   ========================================= */
 
 .session-card-status-xz {
   grid-column: 1;
-
   justify-self: start;
-
-  max-width: 100%;
-
-  padding: 7px 12px;
-
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 25px;
+  padding: 0 9px;
+  box-sizing: border-box;
   border-radius: 999px;
-
-  background: #eff6ff;
-  color: #2563eb;
-
-  font-size: 13px;
-  font-weight: 600;
-
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .35px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
+.session-card-status-xz > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
 
-/* =========================================
-   TIME
-   ========================================= */
+.session-card-status-xz.neutral {
+  background: rgba(32,29,30,.07);
+  color: #625c56;
+}
+
+.session-card-status-xz.files {
+  background: rgba(120,153,186,.13);
+  color: #526e8b;
+}
+
+.session-card-status-xz.review {
+  background: rgba(254,195,69,.19);
+  color: #846000;
+}
+
+.session-card-status-xz.payment {
+  background: rgba(214,107,107,.12);
+  color: #a14e4e;
+}
+
+.session-card-status-xz.paid {
+  background: rgba(139,175,41,.14);
+  color: #587014;
+}
 
 .session-card-time-xz {
   grid-column: 2;
-
-  font-size: 14px;
-  font-weight: 500;
-
-  color: #6b7280;
-
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #8b847d;
+  font-size: 9px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-
-/* =========================================
-   BUTTON
-   ========================================= */
-
-.print-session-card-xz button {
+.print-session-review-btn-xz {
   grid-column: 3;
-
   justify-self: end;
-
-  padding: 10px 16px;
-
-  border: none;
-  border-radius: 9px;
-
-  background: #111827;
-  color: #ffffff;
-
-  font-size: 14px;
-  font-weight: 500;
-
-  white-space: nowrap;
-
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 10px;
+  background: #201d1e;
+  color: white;
+  font-size: 9px;
+  font-weight: 850;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.15s ease;
+  transition: background .16s ease, transform .16s ease;
 }
 
-.print-session-card-xz button:hover {
-  background: #1f2937;
+.print-session-review-btn-xz:hover {
+  background: #8caf29;
 }
 
-.print-session-card-xz button:active {
-  transform: scale(0.97);
+.print-session-review-btn-xz:active {
+  transform: scale(.97);
 }
 
-
-/* =========================================
-   CARD HOVER
-   ========================================= */
-
-.print-session-card-xz:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 8px 20px rgba(15, 23, 42, 0.09);
+.print-session-review-btn-xz:focus-visible {
+  outline: 3px solid rgba(139,175,41,.25);
+  outline-offset: 2px;
 }
-
-
-/* =========================================
-   TABLET
-   ========================================= */
-
-@media (max-width: 900px) {
-  .print-session-card-xz {
-    padding: 18px;
-    gap: 14px;
-  }
-
-  .print-session-card-xz button {
-    padding: 9px 14px;
-  }
-}
-
-
-/* =========================================
-   MOBILE
-   ========================================= */
 
 @media (max-width: 600px) {
   .print-session-card-xz {
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto auto;
-
-    gap: 12px 14px;
-
-    padding: 18px;
-  }
-
-  .print-session-card-xz > div:first-child {
-    grid-column: 1 / -1;
+    gap: 10px 12px;
+    padding: 15px;
   }
 
   .session-card-status-xz {
@@ -203,13 +167,11 @@
 
   .session-card-time-xz {
     grid-column: 2;
-
     justify-self: end;
   }
 
-  .print-session-card-xz button {
+  .print-session-review-btn-xz {
     grid-column: 1 / -1;
-
     width: 100%;
   }
 }
