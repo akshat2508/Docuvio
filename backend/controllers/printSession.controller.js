@@ -1125,11 +1125,27 @@ export const createSessionPaymentOrder = async (req, res, next) => {
     }
 
     // 5. Create Razorpay order
-    const razorpayOrder = await paymentService.createOrder(
-      quotedAmount,
-      `session_${session.session_token}`
-    );
+    const razorpayAccountId = session.shops?.razorpay_account_id;
 
+if (!razorpayAccountId) {
+  return errorResponse(
+    res,
+    "Shop is not connected to Razorpay",
+    400
+  );
+}
+
+const razorpayOrder = await paymentService.createOrderWithTransfer({
+  amount: quotedAmount,
+  receipt: `session_${session.session_token}`,
+  transfers: [
+    {
+      account: razorpayAccountId,
+      amount: quotedAmount * 100,
+      currency: "INR",
+    },
+  ],
+});
     // 6. Save payment
     const { data: payment, error: paymentError } =
       await printSessionService.createSessionPayment({
