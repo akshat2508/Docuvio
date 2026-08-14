@@ -959,11 +959,14 @@ async activateShop(userId) {
   }
 
   // 3. Already activated?
-  if (shop.owner_id) {
-    return {
-      data: shop,
-    };
-  }
+ if (shop.owner_id) {
+  return {
+    error: {
+      message: "Shop has already been activated.",
+      code: "SHOP_ALREADY_ACTIVATED",
+    },
+  };
+}
 
   // 4. Activate shop
   const { data, error } =

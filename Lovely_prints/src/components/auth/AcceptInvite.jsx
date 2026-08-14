@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import api from "../../services/api"
+import inviteApi from "../../services/inviteApi";
 import { supabaseInvite } from "../../services/supabaseInvite";
 
 import "./resetPassword.css";
@@ -37,48 +37,116 @@ export default function AcceptInvite() {
   }, []);
 
   const handleActivate = async () => {
-    if (!sessionReady) return;
+  if (!sessionReady || loading) return;
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
+  setError("");
+
+  // -----------------------------
+  // Validate password
+  // -----------------------------
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // -----------------------------
+    // 1. Update password
+    // -----------------------------
+    const { error: passwordError } =
+      await supabaseInvite.auth.updateUser({
+        password,
+      });
+
+    if (passwordError) {
+      throw new Error(passwordError.message);
     }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
+    console.log("Password updated successfully");
+
+    // -----------------------------
+    // 2. Get fresh invite session
+    // -----------------------------
+    const {
+      data: { session: freshSession },
+      error: sessionError,
+    } = await supabaseInvite.auth.getSession();
+
+    if (sessionError) {
+      throw new Error(sessionError.message);
     }
 
-    setLoading(true);
-    setError("");
-
-    const { error } = await supabaseInvite.auth.updateUser({
-      password,
-    });
-    const session = await supabaseInvite.auth.getSession();
-    console.log("invite Session: ", session.data.session)
-    await api.post(
-    "/shops/activate",
-    {},
-    {
-        headers: {
-        Authorization: `Bearer ${session.data.session.access_token}`,
-        },
+    if (!freshSession?.access_token) {
+      throw new Error(
+        "Invitation session has expired. Please request a new invitation."
+      );
     }
+
+    console.log(
+      "Invite user:",
+      freshSession.user.id
     );
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
+    // IMPORTANT:
+    // This must be the INVITE Supabase token.
+    console.log(
+      "Invite access token exists:",
+      !!freshSession.access_token
+    );
 
-   await supabaseInvite.auth.signOut();
+    // -----------------------------
+    // 3. Activate shop
+    // -----------------------------
+    const response = await inviteApi.post(
+      "/shops/activate",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${freshSession.access_token}`,
+        },
+      }
+    );
 
-alert("Shop activated successfully!");
+    console.log(
+      "Shop activation successful:",
+      response.data
+    );
 
-navigate("/login");
-  };
+    // -----------------------------
+    // 4. Only after activation succeeds
+    // -----------------------------
+    await supabaseInvite.auth.signOut();
+
+    alert("Shop activated successfully!");
+
+    navigate("/login", { replace: true });
+
+  } catch (err) {
+    console.error(
+      "Shop activation failed:",
+      err
+    );
+
+    const message =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Unable to activate shop. Please try again.";
+
+    setError(message);
+
+    // IMPORTANT:
+    // Do NOT navigate here.
+    setLoading(false);
+  }
+};
 
   return (
     <div className="auth-page-F">
