@@ -18,7 +18,7 @@ import {
   submitSessionQuote,
 } from "../../../services/printSessionService";
 
-import "./printSessions.css";
+import "./printSessionReview.css";
 
 /* =========================================================
    HELPERS
