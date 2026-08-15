@@ -115,7 +115,7 @@ export default function AcceptInvite() {
     );
 
     console.log(
-      "Shop activation successful:",
+      "Shop activation was  successful:",
       response.data
     );
 
