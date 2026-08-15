@@ -804,9 +804,9 @@ async getSupervisorDashboardOrders(shopIds) {
 
 //Functions for payments
 async createPayment(data, token) {
-  const supabaseUser = getUserSupabase(token);
 
-  return await supabaseUser
+
+  return await supabaseAdmin
     .from('payments')
     .insert(data)
     .select()
@@ -814,18 +814,28 @@ async createPayment(data, token) {
 }
 
 
-async markPaymentSuccess(orderId, paymentId, signature) {
+async markPaymentSuccess(
+  orderId,
+  paymentId,
+  signature
+) {
   return await supabaseAdmin
-    .from('payments')
+    .from("payments")
     .update({
       razorpay_payment_id: paymentId,
       razorpay_signature: signature,
-      status: 'success',
-      updated_at: new Date()
+      status: "success",
+      updated_at: new Date().toISOString(),
     })
-    .eq('order_id', orderId);
+    .eq("order_id", orderId)
+    .select(`
+      id,
+      order_id,
+      status,
+      razorpay_payment_id
+    `)
+    .maybeSingle();
 }
-
 
 
 
@@ -837,51 +847,94 @@ async getOrderForPayment(orderId) {
     .eq('id', orderId)
     .single();
 }
-
 async markOrderPaid(orderId) {
   return await supabaseAdmin
-    .from('orders')
+    .from("orders")
     .update({
       is_paid: true,
-      status: 'confirmed',
+      status: "confirmed",
       paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     })
-    .eq('id', orderId);
+    .eq("id", orderId)
+    // .eq("is_paid", false)
+    .select(`
+      id,
+      is_paid,
+      status,
+      paid_at
+    `)
+    .maybeSingle();
 }
 //webhook helper functions
 
-async markPaymentWebhookSuccess(razorpayOrderId, razorpayPaymentId, payload) {
+async markPaymentWebhookSuccess(
+  razorpayOrderId,
+  razorpayPaymentId
+) {
   return await supabaseAdmin
-    .from('payments')
+    .from("payments")
     .update({
-      status: 'success',
+      status: "success",
       razorpay_payment_id: razorpayPaymentId,
-      webhook_payload: payload,
-      updated_at: new Date()
+      updated_at: new Date().toISOString(),
     })
-    .eq('razorpay_order_id', razorpayOrderId);
+    .eq("razorpay_order_id", razorpayOrderId)
+    .select(`
+      id,
+      order_id,
+      razorpay_order_id,
+      razorpay_payment_id,
+      status,
+      amount
+    `)
+    .maybeSingle();
 }
-
 
 async markOrderPaidByRazorpayOrder(razorpayOrderId) {
-  const { data: payment } = await supabaseAdmin
-    .from('payments')
-    .select('order_id')
-    .eq('razorpay_order_id', razorpayOrderId)
-    .single();
+  const {
+    data: payment,
+    error: paymentLookupError,
+  } = await supabaseAdmin
+    .from("payments")
+    .select("order_id")
+    .eq("razorpay_order_id", razorpayOrderId)
+    .maybeSingle();
 
-  if (!payment) return;
+  if (paymentLookupError) {
+    return {
+      data: null,
+      error: paymentLookupError,
+    };
+  }
+
+  if (!payment) {
+    return {
+      data: null,
+      error: {
+        message: "Payment record not found",
+        code: "PAYMENT_NOT_FOUND",
+      },
+    };
+  }
 
   return await supabaseAdmin
-    .from('orders')
+    .from("orders")
     .update({
       is_paid: true,
-      status: 'confirmed',
-      updated_at: new Date()
+      status: "confirmed",
+      paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     })
-    .eq('id', payment.order_id);
+    .eq("id", payment.order_id)
+    .select(`
+      id,
+      is_paid,
+      status,
+      paid_at
+    `)
+    .single();
 }
-
 
 
 async getOrdersForOwner(token) {
@@ -956,11 +1009,19 @@ logger.info("SHOP_ORDERS_QUERY_TIME", {
 }
 
 async getPaymentByRazorpayOrder(razorpayOrderId) {
-  return await supabaseAnon
-    .from('payments')
-    .select('status')
-    .eq('razorpay_order_id', razorpayOrderId)
-    .single();
+  return await supabaseAdmin
+    .from("payments")
+    .select(`
+      id,
+      order_id,
+      student_id,
+      amount,
+      razorpay_order_id,
+      razorpay_payment_id,
+      status
+    `)
+    .eq("razorpay_order_id", razorpayOrderId)
+    .maybeSingle();
 }
 
 

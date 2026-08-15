@@ -109,17 +109,40 @@ if (!token) {
   return errorResponse(res, "Invalid token format", 401);
 }
 
-await supabaseService.createPayment(
-  {
-    order_id: orderId,
-    student_id: studentId,
-    amount: order.total_price,
-    platform_fee: platformFee, // convert back to rupees
-    razorpay_order_id: razorpayOrder.id,
-    status: 'created',
-  },
-  token
-);
+const {
+  data: createdPayment,
+  error: paymentCreateError,
+} =
+  await supabaseService.createPayment(
+    {
+      order_id: orderId,
+      student_id: studentId,
+      amount: order.total_price,
+      platform_fee: platformFee,
+      razorpay_order_id: razorpayOrder.id,
+      status: "created",
+    }
+  );
+
+console.log("💳 PAYMENT RECORD CREATION:", {
+  razorpayOrderId: razorpayOrder.id,
+  orderId,
+  createdPayment,
+  paymentCreateError,
+});
+
+if (paymentCreateError || !createdPayment) {
+  console.error(
+    "❌ FAILED TO CREATE LOCAL PAYMENT:",
+    paymentCreateError
+  );
+
+  return errorResponse(
+    res,
+    "Failed to create payment record",
+    500
+  );
+}
 
 
     return successResponse(res, razorpayOrder, 'Payment order created');
@@ -135,58 +158,280 @@ export const verifyPayment = async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      orderId,
     } = req.body;
 
-    console.log("🔥 VERIFY PAYMENT HIT", req.body);
+    console.log("🔥 VERIFY PAYMENT HIT", {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    });
 
-    /* 1️⃣ Idempotency check */
-    const { data: existingPayment } =
-      await supabaseService.getPaymentByRazorpayOrder(
+    // ============================================================
+    // 1️⃣ BASIC VALIDATION
+    // ============================================================
+
+    if (
+      !razorpay_order_id ||
+      !razorpay_payment_id ||
+      !razorpay_signature
+    ) {
+      return errorResponse(
+        res,
+        "Missing payment verification data",
+        400
+      );
+    }
+
+    // ============================================================
+    // 2️⃣ FIND LOCAL PAYMENT USING RAZORPAY ORDER ID
+    // ============================================================
+    // IMPORTANT:
+    // Do NOT trust orderId sent by the frontend.
+    //
+    // We determine the real order from:
+    //
+    // razorpay_order_id
+    //        ↓
+    // payments table
+    //        ↓
+    // order_id
+    //
+    // This makes the database relationship authoritative.
+
+    const {
+      data: existingPayment,
+      error: paymentLookupError,
+    } = await supabaseService.getPaymentByRazorpayOrder(
+      razorpay_order_id
+    );
+
+    if (paymentLookupError) {
+      console.error(
+        "❌ PAYMENT LOOKUP FAILED:",
+        paymentLookupError
+      );
+
+      return errorResponse(
+        res,
+        "Unable to find payment",
+        500
+      );
+    }
+
+    if (!existingPayment) {
+      console.error(
+        "❌ PAYMENT RECORD NOT FOUND:",
         razorpay_order_id
       );
 
-    if (existingPayment?.status === 'success') {
-      return successResponse(res, null, 'Payment already verified');
+      return errorResponse(
+        res,
+        "Payment record not found",
+        404
+      );
     }
 
-    /* 2️⃣ Signature verification */
-    const body = razorpay_order_id + '|' + razorpay_payment_id;
+    // This is now the ONLY order ID we trust.
+    const actualOrderId = existingPayment.order_id;
+
+    console.log("🔎 PAYMENT RECORD FOUND:", {
+      paymentId: existingPayment.id,
+      orderId: actualOrderId,
+      razorpayOrderId:
+        existingPayment.razorpay_order_id,
+      status: existingPayment.status,
+    });
+
+    // ============================================================
+    // 3️⃣ IDEMPOTENCY CHECK
+    // ============================================================
+    //
+    // If webhook already processed the payment while the app
+    // was still open, simply return success.
+    //
+    // This is important because both:
+    //
+    // webhook
+    // AND
+    // /verify
+    //
+    // can arrive for the same payment.
+
+    if (existingPayment.status === "success") {
+      console.log(
+        "ℹ️ PAYMENT ALREADY VERIFIED:",
+        razorpay_order_id
+      );
+
+      return successResponse(
+        res,
+        null,
+        "Payment already verified"
+      );
+    }
+
+    // ============================================================
+    // 4️⃣ VERIFY RAZORPAY SIGNATURE
+    // ============================================================
+
+    const body =
+      razorpay_order_id +
+      "|" +
+      razorpay_payment_id;
 
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .createHmac(
+        "sha256",
+        process.env.RAZORPAY_KEY_SECRET
+      )
       .update(body)
-      .digest('hex');
+      .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      return errorResponse(res, 'Payment verification failed', 400);
+      console.error(
+        "❌ INVALID RAZORPAY PAYMENT SIGNATURE",
+        {
+          razorpay_order_id,
+          razorpay_payment_id,
+        }
+      );
+
+      return errorResponse(
+        res,
+        "Payment verification failed",
+        400
+      );
     }
 
-    /* 3️⃣ Mark payment success */
-    const { error: payErr } =
+    console.log(
+      "✅ RAZORPAY PAYMENT SIGNATURE VERIFIED:",
+      razorpay_order_id
+    );
+
+    // ============================================================
+    // 5️⃣ MARK PAYMENT SUCCESS
+    // ============================================================
+
+    const {
+      data: updatedPayment,
+      error: payErr,
+    } =
       await supabaseService.markPaymentSuccess(
-        orderId,
+        actualOrderId,
         razorpay_payment_id,
         razorpay_signature
       );
 
     if (payErr) {
-      console.error("❌ PAYMENT UPDATE FAILED:", payErr);
-      return errorResponse(res, 'Payment DB update failed', 500);
+      console.error(
+        "❌ PAYMENT UPDATE FAILED:",
+        payErr
+      );
+
+      return errorResponse(
+        res,
+        "Payment DB update failed",
+        500
+      );
     }
 
-    /* 4️⃣ Mark order paid */
-    const { error: orderErr } =
-      await supabaseService.markOrderPaid(orderId);
+    // If the payment update didn't affect a row,
+    // do NOT pretend the payment succeeded.
+    if (!updatedPayment) {
+      console.error(
+        "❌ PAYMENT UPDATE AFFECTED NO ROWS:",
+        {
+          orderId: actualOrderId,
+          razorpayOrderId: razorpay_order_id,
+        }
+      );
+
+      return errorResponse(
+        res,
+        "Payment DB update failed",
+        500
+      );
+    }
+
+    console.log(
+      "✅ PAYMENT MARKED SUCCESS:",
+      {
+        orderId: actualOrderId,
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId:
+          razorpay_payment_id,
+      }
+    );
+
+    // ============================================================
+    // 6️⃣ MARK ORDER PAID
+    // ============================================================
+
+    const {
+      data: updatedOrder,
+      error: orderErr,
+    } =
+      await supabaseService.markOrderPaid(
+        actualOrderId
+      );
 
     if (orderErr) {
-      console.error("❌ ORDER UPDATE FAILED:", orderErr);
-      return errorResponse(res, 'Order update failed', 500);
+      console.error(
+        "❌ ORDER UPDATE FAILED:",
+        orderErr
+      );
+
+      return errorResponse(
+        res,
+        "Order update failed",
+        500
+      );
     }
 
-    return successResponse(res, null, 'Payment successful');
+    // Again, make sure the database actually returned
+    // the updated order.
+    if (!updatedOrder) {
+      console.error(
+        "❌ ORDER UPDATE AFFECTED NO ROWS:",
+        actualOrderId
+      );
+
+      return errorResponse(
+        res,
+        "Order update failed",
+        500
+      );
+    }
+
+    console.log(
+      "✅ ORDER MARKED PAID:",
+      {
+        orderId: actualOrderId,
+        isPaid: updatedOrder.is_paid,
+        status: updatedOrder.status,
+      }
+    );
+
+    // ============================================================
+    // 7️⃣ FINAL SUCCESS
+    // ============================================================
+
+    return successResponse(
+      res,
+      null,
+      "Payment successful"
+    );
+
   } catch (err) {
-    console.error(err);
-    return errorResponse(res, 'Payment verification error', 500);
+    console.error(
+      "❌ PAYMENT VERIFICATION ERROR:",
+      err
+    );
+
+    return errorResponse(
+      res,
+      "Payment verification error",
+      500
+    );
   }
 };

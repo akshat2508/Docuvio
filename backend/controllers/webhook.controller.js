@@ -88,14 +88,15 @@ export const razorpayWebhook = async (req, res) => {
     // ============================================================
 
     if (
-      event.event !== "payment.captured" &&
-      event.event !== "payment.failed"
-    ) {
-      return res.json({
-        received: true,
-        ignored: true,
-      });
-    }
+  event.event !== "payment.captured" &&
+  event.event !== "payment.failed" &&
+  event.event !== "order.paid"
+) {
+  return res.json({
+    received: true,
+    ignored: true,
+  });
+}
 
     // ============================================================
     // 4. EXTRACT PAYMENT
@@ -350,26 +351,98 @@ if (sessionPaymentError) {
     // 7. EXISTING NORMAL ORDER PAYMENT FLOW
     // ============================================================
 
-    if (
-      event.event === "payment.captured"
-    ) {
-      console.log(
-        "🛒 Normal order payment detected:",
-        razorpayOrderId
-      );
+    if (event.event === "payment.captured") {
+  console.log(
+    "🛒 Normal order payment detected:",
+    razorpayOrderId
+  );
 
-      await supabaseService
-        .markPaymentWebhookSuccess(
-          razorpayOrderId,
-          razorpayPaymentId,
-          payment
-        );
+  // =========================================================
+  // 1. Mark local payment successful
+  // =========================================================
 
-      await supabaseService
-        .markOrderPaidByRazorpayOrder(
-          razorpayOrderId
-        );
+  const {
+    data: updatedPayment,
+    error: paymentUpdateError,
+  } =
+    await supabaseService.markPaymentWebhookSuccess(
+      razorpayOrderId,
+      razorpayPaymentId,
+    );
+
+  console.log("💳 WEBHOOK PAYMENT UPDATE:", {
+    razorpayOrderId,
+    updatedPayment,
+    paymentUpdateError,
+  });
+
+  // Database error
+  if (paymentUpdateError) {
+    console.error(
+      "❌ Failed to update payment:",
+      paymentUpdateError
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update payment",
+    });
+  }
+
+  // Payment row doesn't exist
+  if (!updatedPayment) {
+    console.error(
+      "❌ PAYMENT ROW NOT FOUND:",
+      razorpayOrderId
+    );
+
+    // IMPORTANT:
+    // Return 500 so Razorpay retries the webhook.
+    return res.status(500).json({
+      success: false,
+      message: "Local payment record not found",
+    });
+  }
+
+  // =========================================================
+  // 2. Mark order paid
+  // =========================================================
+
+  const {
+    data: updatedOrder,
+    error: orderUpdateError,
+  } =
+    await supabaseService.markOrderPaidByRazorpayOrder(
+      razorpayOrderId
+    );
+
+  console.log("📦 WEBHOOK ORDER UPDATE:", {
+    razorpayOrderId,
+    updatedOrder,
+    orderUpdateError,
+  });
+
+  if (orderUpdateError) {
+    console.error(
+      "❌ Failed to mark order paid:",
+      orderUpdateError
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to mark order paid",
+    });
+  }
+
+  console.log(
+    "✅ PAYMENT + ORDER SUCCESSFULLY CONFIRMED",
+    {
+      razorpayOrderId,
+      razorpayPaymentId,
+      orderId: updatedPayment.order_id,
     }
+  );
+}
 
     // ============================================================
     // 8. ACKNOWLEDGE WEBHOOK
