@@ -1,7 +1,7 @@
 // app.js
 import express from 'express';
 import cors from 'cors';
-
+import supervisorRoutes from './routes/supervisor.routes.js'
 import webhookRoutes from './routes/webhook.routes.js';
 import printSessionRoutes from "./routes/printSession.routes.js";
 import authRoutes from './routes/auth.routes.js';
@@ -104,6 +104,7 @@ app.use('/api/shops', colorModeRoutes);
 app.use('/api/shops', finishTypeRoutes);
 app.use('/api/payments',apiLimiter, paymentRoutes);
 app.use('/api/admin',apiLimiter,adminRoutes);
+app.use("/api/supervisor", supervisorRoutes);
 app.use("/api/notifications",pollingLimiter, notificationRoutes);
 
 app.use(errorMiddleware);

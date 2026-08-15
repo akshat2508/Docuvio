@@ -66,6 +66,19 @@ async getUserById(userId) {
     .single();
 }
 
+async getAppUserById(userId) {
+  return await supabaseAdmin
+    .from("users")
+    .select(`
+      id,
+      name,
+      email,
+      role,
+      organisation_id
+    `)
+    .eq("id", userId)
+    .single();
+}
 
   async updateUser(userId, updates) {
     return await supabase
@@ -592,6 +605,202 @@ async createFinishType(data, token) {
     .select()
     .single();
 }
+// =========================================================
+// SUPERVISOR
+// =========================================================
+
+async getShopsBySupervisor(supervisorId, organisationId) {
+  return await supabaseAdmin
+    .from("shops")
+    .select(`
+      id,
+      shop_name,
+      block,
+      organisation_id,
+      supervisor_id,
+      owner_id,
+      owner_name,
+      owner_email,
+      is_active,
+      is_accepting_orders,
+      status,
+      open_time,
+      close_time,
+      created_at,
+      updated_at
+    `)
+    .eq("supervisor_id", supervisorId)
+    .eq("organisation_id", organisationId)
+    .order("shop_name", { ascending: true });
+}
+
+
+async getSupervisorShop(shopId, supervisorId, organisationId) {
+  return await supabaseAdmin
+    .from("shops")
+    .select(`
+      id,
+      shop_name,
+      block,
+      organisation_id,
+      supervisor_id,
+      owner_id,
+      owner_name,
+      owner_email,
+      is_active,
+      is_accepting_orders,
+      status,
+      open_time,
+      close_time,
+      created_at,
+      updated_at
+    `)
+    .eq("id", shopId)
+    .eq("supervisor_id", supervisorId)
+    .eq("organisation_id", organisationId)
+    .maybeSingle();
+}
+
+
+async getSupervisorShopOrders(shopId) {
+  return await supabaseAdmin
+    .from("orders")
+    .select(`
+      id,
+      order_no,
+      total_price,
+      status,
+      created_at,
+      pickup_at,
+      is_paid,
+      is_handled,
+      is_expired,
+      handling_fee,
+      order_type,
+
+      users (
+        name
+      ),
+
+      documents (
+        id,
+        file_name,
+        page_count,
+        copies,
+        total_price,
+        print_side,
+
+        paper_types ( name ),
+        color_modes ( name ),
+        finish_types ( name )
+      )
+    `)
+    .eq("shop_id", shopId)
+    .eq("is_paid", true)
+    .order("created_at", { ascending: false });
+}
+
+
+async getSupervisorShopAnalytics(shopId) {
+  const { data, error } = await supabaseAdmin
+    .from("orders")
+    .select("id, total_price, created_at")
+    .eq("shop_id", shopId)
+    .eq("is_paid", true);
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  const totalOrders = data.length;
+
+  const totalRevenue = data.reduce(
+    (sum, order) => sum + Number(order.total_price || 0),
+    0
+  );
+
+  const ordersTrend = {};
+  const revenueTrend = {};
+
+  data.forEach((order) => {
+    const date = order.created_at.split("T")[0];
+
+    ordersTrend[date] =
+      (ordersTrend[date] || 0) + 1;
+
+    revenueTrend[date] =
+      (revenueTrend[date] || 0) +
+      Number(order.total_price || 0);
+  });
+
+  const ordersByDate = Object.keys(ordersTrend).map((date) => ({
+    date,
+    count: ordersTrend[date],
+  }));
+
+  const revenueByDate = Object.keys(revenueTrend).map((date) => ({
+    date,
+    amount: revenueTrend[date],
+  }));
+
+  return {
+    data: {
+      totalOrders,
+      totalRevenue,
+      ordersByDate,
+      revenueByDate,
+    },
+    error: null,
+  };
+}
+
+
+async updateSupervisorShopStatus(shopId, supervisorId, organisationId, is_active) {
+  return await supabaseAdmin
+    .from("shops")
+    .update({
+      is_active,
+    })
+    .eq("id", shopId)
+    .eq("supervisor_id", supervisorId)
+    .eq("organisation_id", organisationId)
+    .select()
+    .single();
+}
+
+
+async updateSupervisorShopAcceptingOrders(
+  shopId,
+  supervisorId,
+  organisationId,
+  is_accepting_orders
+) {
+  return await supabaseAdmin
+    .from("shops")
+    .update({
+      is_accepting_orders,
+    })
+    .eq("id", shopId)
+    .eq("supervisor_id", supervisorId)
+    .eq("organisation_id", organisationId)
+    .select()
+    .single();
+}
+
+async getSupervisorDashboardOrders(shopIds) {
+  return await supabaseAdmin
+    .from("orders")
+    .select(`
+      id,
+      shop_id,
+      status,
+      total_price,
+      created_at
+    `)
+    .in("shop_id", shopIds)
+    .eq("is_paid", true)
+    .order("created_at", { ascending: false });
+}
 
 //Functions for payments
 async createPayment(data, token) {
@@ -959,11 +1168,14 @@ async activateShop(userId) {
   }
 
   // 3. Already activated?
-  if (shop.owner_id) {
-    return {
-      data: shop,
-    };
-  }
+ if (shop.owner_id) {
+  return {
+    error: {
+      message: "Shop has already been activated.",
+      code: "SHOP_ALREADY_ACTIVATED",
+    },
+  };
+}
 
   // 4. Activate shop
   const { data, error } =

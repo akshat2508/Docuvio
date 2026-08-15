@@ -765,7 +765,11 @@ async getSessionForPayment(sessionToken) {
       status,
       quoted_amount,
       quoted_at,
-      expires_at
+      expires_at,
+      shops (
+        id,
+        razorpay_account_id
+      )
     `)
     .eq("session_token", sessionToken)
     .single();

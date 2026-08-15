@@ -655,3 +655,6 @@
 {"duration":"307ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-13T13:12:59.982Z"}
 {"duration":"745ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-13T15:47:29.898Z"}
 {"duration":"277ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-13T15:48:28.439Z"}
+{"duration":"820ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"2cc5ccdf-151a-426f-975a-9df12cd253a3","timestamp":"2026-08-14T17:31:45.603Z"}
+{"duration":"355ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-14T17:54:19.347Z"}
+{"duration":"338ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-14T17:56:34.438Z"}
