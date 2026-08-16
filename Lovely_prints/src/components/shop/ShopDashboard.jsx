@@ -69,7 +69,7 @@ const formatHour = (hour) => {
 const generateTimeSlots = (openHour, closeHour) => {
   const slots = [];
 
-  for (let hour = openHour; hour < closeHour; hour++) {
+  for (let hour = openHour; hour <= closeHour; hour++) {
     const start = hour;
     const end = hour + 1;
 

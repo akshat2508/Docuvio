@@ -664,3 +664,13 @@
 {"duration":"396ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:44:28.681Z"}
 {"duration":"300ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:49:11.457Z"}
 {"duration":"407ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:53:42.077Z"}
+{"duration":"313ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:58:43.660Z"}
+{"duration":"250ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:58:52.032Z"}
+{"duration":"220ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T11:59:12.175Z"}
+{"duration":"304ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:03:34.615Z"}
+{"duration":"268ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:03:54.273Z"}
+{"duration":"244ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:03:55.301Z"}
+{"duration":"226ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:03:59.801Z"}
+{"duration":"232ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:04:01.052Z"}
+{"duration":"304ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:04:10.373Z"}
+{"duration":"378ms","level":"info","message":"SHOP_ORDERS_QUERY_TIME","shopId":"d0a04b88-9b0f-42ad-b922-332fcb8ec88b","timestamp":"2026-08-16T12:04:12.207Z"}
