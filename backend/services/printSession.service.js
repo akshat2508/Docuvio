@@ -229,52 +229,67 @@ class PrintSessionService {
    * Get active sessions belonging to the authenticated vendor's
    * shop.
    */
-  async getLiveSessionsForOwner(ownerId) {
-    return await supabaseAdmin
-      .from("print_sessions")
-      .select(`
-        id,
-        shop_id,
-        organisation_id,
-        session_token,
-        customer_name,
-        customer_phone,
-        status,
-        quoted_amount,
-        quoted_at,
-        last_customer_seen,
-        last_vendor_seen,
-        expires_at,
-        created_at,
-        updated_at,
-        session_documents (
-          id,
-          original_filename,
-          mime_type,
-          file_size,
-          upload_status,
-          uploaded_at,
-          page_count,
-          created_at
-        ),
-        shops!inner (
-          id,
-          shop_name,
-          block,
-          owner_id
-        )
-      `)
-      .eq("shops.owner_id", ownerId)
-      .not(
-        "status",
-        "in",
-        '("completed","archived","expired")'
-      )
-      .order("created_at", {
-        ascending: false,
-      });
-  }
+async getLiveSessionsForOwner(ownerId) {
+  const now = new Date();
 
+  const istDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
+  const startOfDay = new Date(`${istDate}T00:00:00+05:30`);
+  const startOfTomorrow = new Date(
+    startOfDay.getTime() + 24 * 60 * 60 * 1000
+  );
+
+  return await supabaseAdmin
+    .from("print_sessions")
+    .select(`
+      id,
+      shop_id,
+      organisation_id,
+      session_token,
+      customer_name,
+      customer_phone,
+      status,
+      quoted_amount,
+      quoted_at,
+      last_customer_seen,
+      last_vendor_seen,
+      expires_at,
+      created_at,
+      updated_at,
+      session_documents (
+        id,
+        original_filename,
+        mime_type,
+        file_size,
+        upload_status,
+        uploaded_at,
+        page_count,
+        created_at
+      ),
+      shops!inner (
+        id,
+        shop_name,
+        block,
+        owner_id
+      )
+    `)
+    .eq("shops.owner_id", ownerId)
+    .gte("created_at", startOfDay.toISOString())
+    .lt("created_at", startOfTomorrow.toISOString())
+    .not(
+      "status",
+      "in",
+      '("completed","archived","expired")'
+    )
+    .order("created_at", {
+      ascending: false,
+    });
+}
   // ============================================================
   // SESSION DOCUMENTS
   // ============================================================
@@ -694,6 +709,20 @@ async getSessionForShop(sessionToken, shopId) {
 }
 
 async getActiveSessionsForShop(shopId) {
+  const now = new Date();
+
+  const istDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
+  const startOfDay = new Date(`${istDate}T00:00:00+05:30`);
+  const startOfTomorrow = new Date(
+    startOfDay.getTime() + 24 * 60 * 60 * 1000
+  );
+
   return await supabaseAdmin
     .from("print_sessions")
     .select(`
@@ -711,6 +740,8 @@ async getActiveSessionsForShop(shopId) {
       updated_at
     `)
     .eq("shop_id", shopId)
+    .gte("created_at", startOfDay.toISOString())
+    .lt("created_at", startOfTomorrow.toISOString())
     .in("status", [
       "connected",
       "customer_details",
@@ -725,8 +756,6 @@ async getActiveSessionsForShop(shopId) {
       ascending: false,
     });
 }
-
-
 async createSessionQuote(sessionToken, shopId, quotedAmount) {
   return await supabaseAdmin
     .from("print_sessions")
