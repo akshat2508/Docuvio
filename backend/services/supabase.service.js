@@ -1343,6 +1343,60 @@ async getDocumentTotal(orderId) {
     .eq("order_id", orderId);
 }
 
+async getOrdersForPickupReminder(
+  startIso,
+  endIso,
+  statuses
+) {
+  return await supabaseAdmin
+    .from("orders")
+    .select(`
+      id,
+      order_no,
+      shop_id,
+      pickup_at,
+      status,
+      is_paid,
+
+      shop:shops!fk_order_shop (
+        id,
+        shop_name,
+        owner_id,
+        supervisor_id
+      )
+    `)
+    .eq("is_paid", true)
+    .gt("pickup_at", startIso)
+    .lte("pickup_at", endIso)
+    .in("status", statuses)
+    .not("shop_id", "is", null)
+    .order("pickup_at", {
+      ascending: true,
+    });
+}
+
+
+async claimPickupReminders(reminders) {
+  if (!reminders || reminders.length === 0) {
+    return {
+      data: [],
+      error: null,
+    };
+  }
+
+  return await supabaseAdmin
+    .from("order_pickup_reminders")
+    .upsert(
+      reminders,
+      {
+        onConflict: "order_id,reminder_type",
+        ignoreDuplicates: true,
+      }
+    )
+    .select(
+      "order_id, reminder_type, sent_at"
+    );
+}
 }
 export { supabaseAdmin , supabaseAnon};
 export default new SupabaseService();
